@@ -4,5 +4,5 @@ public class Token
 {
     public string? Identifier = null;
     public string? Type = null;
-    public int index;
+    public bool isTypeDeclaration = false;
 }

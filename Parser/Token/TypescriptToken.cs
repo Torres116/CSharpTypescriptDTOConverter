@@ -4,7 +4,7 @@ public class TypescriptToken
 {
     public string Identifier { get; set; }
     public string Type { get; set; }
-    public bool Array { get; set; }
-    public bool Object { get; set; }
-    public bool Nullable { get; set; }
+    public bool IsArray { get; set; }
+    public bool IsDictionary { get; set; }
+    public bool IsNullable { get; set; }
 }

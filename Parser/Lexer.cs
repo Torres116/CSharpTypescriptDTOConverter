@@ -1,15 +1,20 @@
 namespace Parser;
 
+/// <summary>
+/// Represents a lexer that tokenizes input text into structured tokens for further parsing.
+/// </summary>
+/// <remarks>
+/// This class is responsible for processing input text, ignoring certain predefined keywords,
+/// and creating token objects with type and identifier information. It handles the formatting of textual
+/// input and identifies valid tokens based on specific criteria.
+/// </remarks>
 internal class Lexer
 {
-    readonly string[] dataTypes =
-    [
-        "class",
-        "struct",
-        "interface",
-        "enum"
-    ];
-
+    /// <summary>
+    /// Represents a collection of keywords that are ignored during the tokenization process
+    /// in the <c>Lexer</c> class. These keywords are typically related to access modifiers
+    /// or specific C# syntax elements that are not necessary for token categorization.
+    /// </summary>
     readonly string[] ignoredKeywords =
     [
         "public",
@@ -17,8 +22,13 @@ internal class Lexer
         "protected",
         "internal",
         "async"
+        
     ];
 
+    /// <summary>
+    /// Represents an array of strings containing the types of tokens
+    /// that the lexer recognizes during the tokenization process.
+    /// </summary>
     readonly string[] tokenType =
     [
         "class",
@@ -31,10 +41,15 @@ internal class Lexer
         "double",
         "char",
         "datetime",
-        "timespan"
+        "timespan",
     ];
-    
 
+
+    /// <summary>
+    /// Tokenizes the input string into a list of tokens based on predefined rules for identifiers and types.
+    /// </summary>
+    /// <param name="input">The input string to be tokenized, typically containing code or text to analyze.</param>
+    /// <returns>A list of tokens, where each token represents a significant element of the input, including its type and identifier.</returns>
     public List<Token.Token> Tokenize(string input)
     {
         var result = new List<Token.Token>();
@@ -50,7 +65,7 @@ internal class Lexer
                 var token = new Token.Token();
                 var current = formattedInput[i].Split([" "], StringSplitOptions.RemoveEmptyEntries)
                     .Where(c => !ignoredKeywords.Contains(c))
-                    .Select(c => c.Replace("{","").Replace("}",""))
+                    .Select(c => c.Replace("{","").Replace("}","").Replace("get","").Replace("set",""))
                     .ToArray();
                 
                 for (var j = 0; j < current.Length; j++)
@@ -68,18 +83,17 @@ internal class Lexer
                     if (token.Type == null && current.Length - 1 > j )
                         token.Type = current[j];
                     
-                    if (dataTypes.Contains(current[j]))
+                    if (current[j] == "class")
+                    {
+                        token.isTypeDeclaration = true;
                         continue;
-
-                    if (current[j] == "get" || current[j] == "set")
-                        continue;
+                    }
                     
                     token.Identifier = current[j];
                 }
                 
                 if (token is { Type: not null, Identifier: not null })
                     result.Add(token);
-                // Console.WriteLine(token.Identifier + " " + token.Type );
             }
         }
         catch (Exception e)

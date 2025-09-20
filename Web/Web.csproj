@@ -25,7 +25,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Parser\Parser.csproj" />
-      <ProjectReference Include="..\utils\utils.csproj" />
     </ItemGroup>
 
 </Project>
