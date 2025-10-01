@@ -60,7 +60,7 @@ internal sealed class Lexer
                 var token = new Token.Token();
                 var currentLine = formattedInput[i].Split([" "], StringSplitOptions.RemoveEmptyEntries)
                     .Where(c => !ignoredKeywords.Contains(c))
-                    .Select(c => c.Replace("{","").Replace("}","").Replace("get","").Replace("set",""))
+                    .Select(c => c.Replace("{","").Replace("}",""))
                     .ToArray();
                 
                 for (var j = 0; j < currentLine.Length; j++)

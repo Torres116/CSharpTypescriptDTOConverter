@@ -3,7 +3,6 @@ namespace Parser.Formatter;
 
 public class TypescriptFormatter(FormatOptions formatOptions) 
 {
-
     public string GetIdent()
     {
         var ident = new string(' ', formatOptions.IdentSize * formatOptions.IdentLevel);
@@ -16,7 +15,7 @@ public class TypescriptFormatter(FormatOptions formatOptions)
         return tab;
     }
 
-    public static string Format(string text)
+    public static string FormatVar(string text)
     {
         return text;
     }
