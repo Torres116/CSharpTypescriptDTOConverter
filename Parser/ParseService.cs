@@ -4,7 +4,7 @@ using Parser.Token;
 
 namespace Parser;
 
-public class ParseService
+public sealed class ParseService
 {
     Config _config;
     
@@ -22,12 +22,13 @@ public class ParseService
             var parser = ParserFactory.GetParser(_config.parser);
             var tokens = lexer.Tokenize(text);
             var parsedResult = parser.Parse(tokens);
+            Console.WriteLine(parsedResult.Result);
             return parsedResult.Result;
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
-            throw;
+            return "";
         }
 
     }

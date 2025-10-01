@@ -7,13 +7,13 @@ using Parser.TokenGenerator;
 
 namespace Parser.Parsers;
 
-public class TypescriptParser : IParser
+public sealed class TypescriptParser : IParser
 {
 
     public Task<string> Parse(List<Token.Token> tokens)
     {
-        if (tokens.Count is 0 || !tokens.Any(c => c.Type == "class"))
-            return Task.FromResult(string.Empty);
+        // if (tokens.Count is 0 || !tokens.Any(c => c.IsTypeDeclaration))
+        //     return Task.FromResult(string.Empty);
         
         var generator = new TypescriptTokenGenerator();
         List<TypescriptToken> tsTokens =
@@ -38,6 +38,7 @@ public class TypescriptParser : IParser
                 sb.AppendLine();
                 continue;
             }
+            
             
             var ident = ft.GetIdent();
             var tab = ft.GetTab();
