@@ -2,18 +2,17 @@ using Parser.Context;
 using Parser.Interfaces;
 using Parser.Token;
 using Parser.TokenGenerator.strategies;
-using Parser.utils;
 
 namespace Parser.TokenGenerator;
 
 public class TypescriptTokenGenerator : ITokenGenerator
 {
-    private List<ITokenTypeGeneratorStrategy> _strategies;
+    private List<ITokenTypeHandler> _typeHandlers;
 
     public TypescriptToken InterpretToken(Token.Token token)
     {
 
-        _strategies = new List<ITokenTypeGeneratorStrategy>
+        _typeHandlers = new List<ITokenTypeHandler>
         {
             new PrimitiveConversionStrategy(),
             new NullableTypeConversionStrategy(this),
@@ -26,10 +25,7 @@ public class TypescriptTokenGenerator : ITokenGenerator
         var _t = new TypescriptToken
         {
             Type = convertedType,
-            Identifier = token.Identifier,
-            IsNullable = token.Type.Contains('?'),
-            IsArray = token.Type.Contains("[]") || token.Type.Contains("List<"),
-            IsDictionary = token.Type.Contains("Dictionary<")
+            Identifier = token.Identifier
         };
 
         return _t;
@@ -37,7 +33,7 @@ public class TypescriptTokenGenerator : ITokenGenerator
 
     public string Convert(string type)
     {
-        foreach (var _strategy in _strategies)
+        foreach (var _strategy in _typeHandlers)
         {
             if (_strategy.CanConvert(type))
                type = _strategy.Convert(type);

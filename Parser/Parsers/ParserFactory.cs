@@ -10,7 +10,7 @@ public static class ParserFactory
         {
             "Typescript" => new TypescriptParser(),
             "CSharp" => throw new NotImplementedException(),
-            _ => throw new ArgumentOutOfRangeException(nameof(parser), parser, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(parser), parser,"parser doesn't exist")
         };
     }
 }
