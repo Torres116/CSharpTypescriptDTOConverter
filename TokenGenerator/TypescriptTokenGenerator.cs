@@ -17,16 +17,15 @@ public class TypescriptTokenGenerator : ITokenGenerator
         _typeHandlers = new List<ITokenTypeHandler>
         {
             new PrimitiveConversionHandler(),
-            new NullableTypeConversionHandler(this),
             new DictionaryTypeConversionHandler(this),
-            new ListTypeConversionHandler(this)
+            new ListTypeConversionHandler(this),
+            new NullableTypeConversionHandler(this)
         };
     }
 
     public TypescriptToken InterpretToken(Token token)
     {
         var convertedType = Convert(token.Type ?? string.Empty);
-
         var _t = new TypescriptToken
         {
             Type = convertedType,
@@ -38,13 +37,12 @@ public class TypescriptTokenGenerator : ITokenGenerator
 
     public string Convert(string type)
     {
-        foreach (var _strategy in _typeHandlers ?? [])
+        foreach (var handler in _typeHandlers ?? [])
         {
-            if (_strategy.CanConvert(type))
-               type = _strategy.Convert(type);
+            if (handler.CanConvert(type))
+                type = handler.Convert(type);
         }
 
         return type;
     }
-    
 }

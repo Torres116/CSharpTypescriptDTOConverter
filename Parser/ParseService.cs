@@ -4,7 +4,7 @@ namespace Parser;
 
 public sealed class ParseService
 {
-    Config _config;
+    public static Config _config;
     
     public string ParseText(string text,Config cfg)
     {

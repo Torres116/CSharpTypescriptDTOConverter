@@ -1,104 +1,191 @@
-@using Formatter.Formatter
 @using Formatter.Options
+@using Formatter.Options.utils
 @using Web.Components.buttons
 
-<div id="formatOptionsContainer">
-    <div id="foInnerContainer">
-        <h1 style="padding-bottom: 20px;"> Conversion Formatter </h1>
+<section class="flex flex-col gap-6 lg:max-w-[440px] relative">
+    
+    <div class="p-4 w-full flex flex-col gap-4 border border-white/10 rounded-lg bg-[#222222]">
+        <h2 class="text-white">Conversion Format</h2>
         
-        <div id="ConversionFormatOptions">
-            
-            @* Type Declaration *@
-            <Dropdown Options="_typeDeclarationOptions"
-                      Title="Typescript Type Declaration"
-                      OnValueChange="OnTypeDeclarationChange"/>
-            
-            <Dropdown Options="_namingConvention"
-                      Title="Naming Convention"
-                      OnValueChange="OnNamingConventionChange"/>
-            
-            <InputField Title="Tab Size"
-                        OnValueChange="OnTabSizeChanged"/>
-            
+        <Dropdown Options="_typeDeclarationOptions" Title="Typescript Output Component" 
+                  OnValueChange="OnTypeDeclarationChange"/>
+        
+        <Dropdown Options="_namingConvention" Title="Naming Convention"
+                  OnValueChange="OnNamingConventionChange" />
+        
+        <div class="flex w-full gap-2">
+            <Dropdown Options="_tabSize" Title="Tab Size" OnValueChange="OnTabSizeChanged"/>
+            <Dropdown Options="_identSize" Title="Ident Size" OnValueChange="OnIdentSizeChanged"/>
         </div>
     </div>
-</div>
 
-<style>
-    
-    h1 {
-        font-weight: normal;
-        color: var(--mainFontColor);
-        font-size: 20px;
-    }
-    
-    #formatOptionsContainer{
-        display: flex;
-        padding-block: 10px;
-        width: 300px;
-        height: auto;
-        background-color: var(--mainBgColor);
-        border-color: var(--mainBorderColor);
-        border-style: solid;
-        border-width: 1px 0 1px 1px;
-        border-radius: 8px 0 0 8px;
-    }
-    
-    #foInnerContainer {
-        display: flex;
-        width: 100%;
-        height: 100%;
-        flex-direction: column;
-        align-items: center;
-        gap:10px;
-        padding: 10px;
-    }
-    
-    #ConversionFormatOptions {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        width: 90%;
-        justify-content: center;
-    }
-</style>
+    <div class="p-4 w-full flex flex-col gap-4  border border-white/10 rounded-lg bg-[#222222]">
+        <h2 class="text-white">Conversion Options</h2>
+        
+        <div class="flex gap-2 items-center">
+            <Checkbox OnValueChange="OnGenerateConstructorChanged" InitialState="generateConstructor"/>
+            <h2 class="text-white/60">Generate Constructor</h2>
+        </div>
+
+        <div class="flex gap-2 items-center">
+            <Checkbox OnValueChange="OnAddTypeAnnotationsChanged" InitialState="addTypeAnnotations"/>
+            <h2 class="text-white/60">Add Type Annotations</h2>
+        </div>
+
+        <div class="flex gap-2 items-center">
+            <Checkbox OnValueChange="OnDatesAsStringsChanged" InitialState="datesAsStrings"/>
+            <h2 class="text-white/60">Dates as string</h2>
+        </div>
+
+        <div class="flex gap-2 items-center">
+            <Checkbox OnValueChange="OnIncludeCommentsChanged" InitialState="includeComments"/>
+            <h2 class="text-white/60">Include Comments</h2>
+        </div>
+
+        <div class="flex gap-2 items-center">
+            <Checkbox OnValueChange="OnIncludeNullablesChanged" InitialState="includeNullables"/>
+            <h2 class="text-white/60">Include Nullables</h2>
+        </div>
+        
+    </div>
+</section>
 
 
 @code {
+    
+    // Local copies of the static options
+    private bool generateConstructor = FormatOptions.GenerateConstructor;
+    private bool addTypeAnnotations = FormatOptions.AddTypeAnnotations;
+    private bool datesAsStrings = FormatOptions.DatesAsStrings;
+    private bool includeComments = FormatOptions.IncludeComments;
+    private bool includeNullables = FormatOptions.IncludeNullables;
 
-    readonly TypescriptFormatOptions options = TypescriptFormatOptions.GetInstance;
+    [Parameter] public EventCallback UpdateCallback { get; set; }
 
     readonly List<DropdownOption> _typeDeclarationOptions = new()
     {
-        new DropdownOption("interface",0),
-        new DropdownOption("class",1),
-        new DropdownOption("struct",2)
+        new DropdownOption("interface", 0),
+        new DropdownOption("type", 1),
+        new DropdownOption("class", 2)
     };
-    
+
     readonly List<DropdownOption> _namingConvention = new()
     {
-        new DropdownOption("camelCase",0),
-        new DropdownOption("PascalCase",1),
-        new DropdownOption("snake_case",2)
+        new DropdownOption("CamelCase", 0),
+        new DropdownOption("PascalCase", 1),
+        new DropdownOption("SnakeCase", 2)
     };
     
-    public void OnTypeDeclarationChange(DropdownOption value)
+    readonly List<DropdownOption> _tabSize = new()
     {
-        
-    }
+        new DropdownOption("2", 0),
+        new DropdownOption("4", 1),
+        new DropdownOption("8", 2)
+    };
     
-    public void OnNamingConventionChange(DropdownOption value)
+    readonly List<DropdownOption> _identSize = new()
     {
-        
+        new DropdownOption("2", 0),
+        new DropdownOption("4", 1),
+        new DropdownOption("8", 2)
+    };
+
+    void OnTypeDeclarationChange(DropdownOption option)
+    {
+        switch (option.Value)
+        {
+            case "class":
+                FormatOptions.TypeDeclaration = TypeDeclaration.Class;
+                break;
+            case "interface":
+                FormatOptions.TypeDeclaration = TypeDeclaration.Interface;
+                break;
+            default:
+                return;
+        }
+
+        Update();
     }
 
-    public void OnTabSizeChanged(string value)
+    void OnNamingConventionChange(DropdownOption option)
     {
-        if (!int.TryParse(value, out var val)) return;
-        
-        options.TabSize = val;
-        Console.WriteLine($"Tab size set to: {options.TabSize}");
+        switch (option.Value)
+        {
+            case "PascalCase":
+                FormatOptions.NamingConvention = NamingConvention.PascalCase;
+                break;
+            case "CamelCase":
+                FormatOptions.NamingConvention = NamingConvention.CamelCase;
+                break;
+            case "SnakeCase":
+                FormatOptions.NamingConvention = NamingConvention.SnakeCase;
+                break;
+
+            default:
+                return;
+        }
+
+        Update();
+    }
+
+    void OnTabSizeChanged(DropdownOption option)
+    {
+        if (!int.TryParse(option.Value, out var val)) return;
+
+        FormatOptions.TabSize = val;
         StateHasChanged();
+        Update();
+    }
+    
+    void OnIdentSizeChanged(DropdownOption option)
+    {
+        if (!int.TryParse(option.Value, out var val)) return;
+
+        FormatOptions.IdentSize = val;
+        StateHasChanged();
+        Update();
+    }
+
+    void OnGenerateConstructorChanged(bool value)
+    {
+        FormatOptions.GenerateConstructor = value;
+        Update();
+    }
+    
+    void OnAddTypeAnnotationsChanged(bool value)
+    {
+        FormatOptions.AddTypeAnnotations = value;
+        Update();
+    }
+    
+    void OnDatesAsStringsChanged(bool value)
+    {
+        FormatOptions.DatesAsStrings = value;
+        Update();
+    }
+    
+    void OnIncludeCommentsChanged(bool value)
+    {
+        FormatOptions.IncludeComments = value;
+        Update();
+    }
+    
+    void OnIncludeNullablesChanged(bool value)
+    {
+        FormatOptions.IncludeNullables = value;
+        Update();
+    }
+    
+    async void Update()
+    {
+        try
+        {
+            await UpdateCallback.InvokeAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
     }
 
 }

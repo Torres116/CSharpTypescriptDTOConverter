@@ -2,19 +2,17 @@ using System.Text;
 using Formatter.Formatter.handlers;
 using Formatter.interfaces;
 using Formatter.Options;
-using Formatter.Options.Enums;
 using Formatter.Options.utils;
 
 namespace Formatter.Formatter;
 
 public class TypescriptFormatter : IFormatter
 {
-    private FormatOptions _formatOptions { get; } = FormatOptions.GetInstance;
     private StringBuilder sb { get; } = new();
 
     private string GetTypeDeclaration()
     {
-        return _formatOptions.TypeDeclaration switch
+        return FormatOptions.TypeDeclaration switch
         {
             TypeDeclaration.Class => "class",
             TypeDeclaration.Interface => "interface",
@@ -25,13 +23,13 @@ public class TypescriptFormatter : IFormatter
 
     private string GetIdent()
     {
-        var ident = new string(' ', _formatOptions.IdentSize * _formatOptions.IdentLevel);
+        var ident = new string(' ', FormatOptions.IdentSize * FormatOptions.IdentLevel);
         return ident;
     }
 
     private string GetTab()
     {
-        var tab = new string(' ', _formatOptions.TabSize);
+        var tab = new string(' ', FormatOptions.TabSize);
         return tab;
     }
 
@@ -49,7 +47,7 @@ public class TypescriptFormatter : IFormatter
 
     private string FormatNamingConvention(string identifier)
     {
-        return _formatOptions.NamingConvention switch
+        return FormatOptions.NamingConvention switch
         {
             NamingConvention.CamelCase => NamingConventionHandler.ToCamelCase(identifier),
             NamingConvention.PascalCase => NamingConventionHandler.ToPascalCase(identifier),
@@ -60,7 +58,7 @@ public class TypescriptFormatter : IFormatter
 
     public void FormatLine(string identifier, string type)
     {
-        if (_formatOptions.TypeDeclaration != TypeDeclaration.Interface)
+        if (FormatOptions.TypeDeclaration != TypeDeclaration.Interface)
             return;
 
         if (string.IsNullOrWhiteSpace(identifier) || string.IsNullOrWhiteSpace(type))
@@ -71,10 +69,10 @@ public class TypescriptFormatter : IFormatter
         //TODO: Change this
         sb.Append(GetIdent());
         sb.Append(identifier);
-        sb.Append(":");
+        sb.Append(':');
         sb.Append(GetTab());
         sb.Append(type);
-        sb.Append(";");
+        sb.Append(';');
         sb.AppendLine();
     }
 

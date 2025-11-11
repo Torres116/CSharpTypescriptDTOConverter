@@ -4,5 +4,5 @@ public enum NamingConvention
 {
     PascalCase,
     CamelCase,
-    SnakeCase,
+    SnakeCase
 }

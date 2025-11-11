@@ -41,6 +41,9 @@ internal sealed class Lexer
 
     public List<Token> Tokenize(string input)
     {
+        if (string.IsNullOrWhiteSpace(input))
+            return [];
+        
         var result = new List<Token>();
         var separators = new[]{"\n"};
         var formattedInput = input.Split(separators, StringSplitOptions.RemoveEmptyEntries)

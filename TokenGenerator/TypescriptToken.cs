@@ -1,6 +1,3 @@
 namespace TokenGenerator;
 
-public class TypescriptToken : Token
-{
-
-}
+public class TypescriptToken : Token;

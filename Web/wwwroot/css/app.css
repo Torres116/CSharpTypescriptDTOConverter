@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@font-face {
+    font-family: "JetBrainsMono";
+    src: url("/fonts/JetBrainsMono[wght].ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+code, pre,textarea {
+    font-family: "jetbrainsMono", monospace;
+}

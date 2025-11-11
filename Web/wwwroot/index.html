@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Blazor</title>
     <base href="/" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!--    HighlightJS-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
+
     <link rel="stylesheet" href="css/Default.css"/>
     <!-- If you add any scoped CSS files, uncomment the following to load them
     <link href="Blazor.styles.css" rel="stylesheet" /> -->
@@ -16,6 +21,39 @@
     </div>
 
     <script src="_framework/blazor.webassembly.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/go.min.js"></script>
+ 
 </body>
+
+<script>
+    window.highlightCodeBlocks = (selector = 'code') => {
+
+        // Mute Logs
+        const originalWarn = console.warn;
+        const originalLog = console.log;
+
+        console.warn = () => {};
+        console.log = () => {};
+
+        document.querySelectorAll(selector).forEach(block => {
+            block.removeAttribute('data-highlighted');
+            hljs.highlightElement(block);
+        });
+
+        console.warn = originalWarn;
+        console.log = originalLog;
+    };
+</script>
+
+<style>
+    pre.hljs, code.hljs {
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block; /* optional, ensures line breaks */
+        background: transparent !important; /* removes theme background if you have your own */
+    }
+
+</style>
 
 </html>
