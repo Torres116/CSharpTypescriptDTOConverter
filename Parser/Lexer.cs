@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Formatter.Options;
 using TokenGenerator;
 
 namespace Parser;
@@ -54,6 +55,10 @@ internal sealed class Lexer
         const string genericTypePattern = @"(?<=<[^>]*)\s+(?=[^<]*>)";
         for (var k = 0; k < formattedInput.Length; k++)
             formattedInput[k] = Regex.Replace(formattedInput[k], genericTypePattern, "");
+        
+        // Remove nullable from types
+        if(!FormatOptions.IncludeNullables)
+           formattedInput = formattedInput.Select(c => c.Replace("?","")).ToArray();
         
         try
         {

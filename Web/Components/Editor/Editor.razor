@@ -4,32 +4,60 @@
 
 
 <div
-    class="lg:max-w-[700px] lg:min-h-[560px] xl:min-h-[700px] flex-grow flex flex-col border border-white/10 rounded-lg bg-[#222222] overflow-clip">
+    class="lg:max-w-[700px] md:w-[400px] h-[400px] md:min-h-[600px] lg:h-[560px] xl:h-[700px]
+    flex-grow flex flex-col border border-white/10 rounded-lg bg-[#222222] overflow-clip">
     <div class="w-full h-14 p-4 flex items-center justify-between border-b border-white/10">
         <div class="flex gap-2 items-center">
             <img src="@Config.LogoPath" alt="Logo" class="h-6 w-6"/>
             <h1 class="text-lg">@Config.Title</h1>
         </div>
 
-        <button class="flex items-center hover:opacity-70 hover:bg-gray-100/10 p-[6px] rounded-lg ">
-            <CopySVG/>
-        </button>
+        <div class="flex gap-2">
+
+            <button class="flex items-center hover:opacity-70 hover:bg-gray-100/10 p-[6px] rounded-lg"
+                    onclick="@CopyTextToClipboard">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="none"
+                     stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M7 7m0 2.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 
+                        2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667z"/>
+                    <path d="M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2
+                        -2h10c.75 0 1.158 .385 1.5 1"/>
+                </svg>
+            </button>
+
+            @if (!Config.IsReadOnly)
+            {
+                <button class="flex items-center hover:opacity-70 hover:bg-gray-100/10 p-[6px] rounded-lg"
+                        onclick="@PasteTextToArea">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                         stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2"/>
+                        <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z"/>
+                    </svg>
+                </button>
+            }
+
+        </div>
+
     </div>
 
-    <div class="flex-1 flex ">
+    <div class="flex-1 flex overflow-hidden">
         @if (Config.IsReadOnly)
         {
-            <div class="h-full w-full flex p-2 overflow-auto">
+            <div class="h-full w-full flex p-2 overflow-scroll">
                 <pre class="w-full h-full p-0 m-0">
                     <code
-                        class="language-typescript bg-transparent text-md xl:text-lg whitespace-pre font-mono">@Text</code>
+                        class="language-typescript bg-transparent h-full text-md xl:text-lg
+                            whitespace-pre font-mono">@Text</code>
                 </pre>
             </div>
         }
         else
         {
-            <textarea class="w-full p-2 bg-transparent text-white/90 font-mono text-md xl:text-lg
-            resize-none focus:outline-none"
+            <textarea class="w-full h-full p-2 bg-transparent text-white/90 font-mono text-sm xl:text-lg
+                resize-none focus:outline-none" id="inputeditor"
                       spellcheck="false"
                       autocapitalize="off"
                       autocomplete="off"
@@ -40,16 +68,27 @@
     </div>
 
     <div class="flex items-center p-4 border-t border-white/10 h-10 w-full bg-[#1a1a1a]">
-        <span class="text-xs text-white/40">@($"{Text?.Length ?? 0} characters")</span>
+        <span class="text-xs text-white/40"> @($"{Text?.Split("\n").Length ?? 0} Lines" ) - 
+             @($"{Text?.Length ?? 0} characters")</span>
     </div>
 
 </div>
 
+<script>
 
+    function CopyText(text) {
+        navigator.clipboard.writeText(text)
+    }
+
+    function PasteText() {
+        return navigator.clipboard.readText()
+    }
+
+</script>
 
 @code {
 
-    [Parameter] public string Text { get; set; }
+    [Parameter] public string Text { get; set; } = "";
     [Parameter] public required EditorConfig Config { get; set; }
     [Parameter] public EventCallback<string> OnChange { get; set; }
 
@@ -65,6 +104,20 @@
     {
         if (!Config.IsReadOnly)
             await OnChange.InvokeAsync(e.Value?.ToString());
+    }
+
+    private async Task CopyTextToClipboard()
+    {
+        await JS.InvokeVoidAsync("copyText", Text);
+    }
+
+    private async Task PasteTextToArea()
+    {
+        var result = await JS.InvokeAsync<string>("PasteText");
+        if (string.IsNullOrEmpty(result))
+            return;
+
+        Text = result;
     }
 
 }

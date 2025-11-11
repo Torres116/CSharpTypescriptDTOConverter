@@ -21,18 +21,19 @@ public class TypescriptTokenGenerator : ITokenGenerator
             new ListTypeConversionHandler(this),
             new NullableTypeConversionHandler(this)
         };
+        
     }
 
     public TypescriptToken InterpretToken(Token token)
     {
         var convertedType = Convert(token.Type ?? string.Empty);
-        var _t = new TypescriptToken
+        var t = new TypescriptToken
         {
             Type = convertedType,
             Identifier = token.Identifier
         };
 
-        return _t;
+        return t;
     }
 
     public string Convert(string type)

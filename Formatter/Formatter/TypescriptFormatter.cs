@@ -10,24 +10,24 @@ public class TypescriptFormatter : IFormatter
 {
     private StringBuilder sb { get; } = new();
 
-    private string GetTypeDeclaration()
+    private static string GetTypeDeclaration()
     {
         return FormatOptions.TypeDeclaration switch
         {
             TypeDeclaration.Class => "class",
-            TypeDeclaration.Interface => "interface",
+            TypeDeclaration.Interface => "export interface",
             TypeDeclaration.Enum => "enum",
             _ => throw new ArgumentOutOfRangeException()
         };
     }
 
-    private string GetIdent()
+    private static string GetIdent()
     {
         var ident = new string(' ', FormatOptions.IdentSize * FormatOptions.IdentLevel);
         return ident;
     }
 
-    private string GetTab()
+    private static string GetTab()
     {
         var tab = new string(' ', FormatOptions.TabSize);
         return tab;
@@ -45,7 +45,7 @@ public class TypescriptFormatter : IFormatter
         sb.Append("}");
     }
 
-    private string FormatNamingConvention(string identifier)
+    private static string FormatNamingConvention(string identifier)
     {
         return FormatOptions.NamingConvention switch
         {

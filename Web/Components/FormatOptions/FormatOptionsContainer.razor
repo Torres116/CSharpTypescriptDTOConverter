@@ -2,7 +2,7 @@
 @using Formatter.Options.utils
 @using Web.Components.buttons
 
-<section class="flex flex-col gap-6 lg:max-w-[440px] relative">
+<section class="flex flex-row lg:flex-col w-full justify-center lg:justify-start lg:max-w-[320px] gap-2 lg:gap-6 relative">
     
     <div class="p-4 w-full flex flex-col gap-4 border border-white/10 rounded-lg bg-[#222222]">
         <h2 class="text-white">Conversion Format</h2>
@@ -13,7 +13,7 @@
         <Dropdown Options="_namingConvention" Title="Naming Convention"
                   OnValueChange="OnNamingConventionChange" T="string" />
         
-        <div class="flex w-full gap-2">
+        <div class="flex flex-row flex-wrap lg:flex-nowrap w-full gap-2">
             <Dropdown Options="_tabSize" Title="Tab Size" T="int" OnValueChange="OnTabSizeChanged"/>
             <Dropdown Options="_identSize" Title="Ident Size" T="int" OnValueChange="OnIdentSizeChanged"/>
         </div>
@@ -25,11 +25,6 @@
         <div class="flex gap-2 items-center">
             <Checkbox OnValueChange="OnGenerateConstructorChanged" InitialState="generateConstructor"/>
             <h2 class="text-white/60">Generate Constructor</h2>
-        </div>
-
-        <div class="flex gap-2 items-center">
-            <Checkbox OnValueChange="OnAddTypeAnnotationsChanged" InitialState="addTypeAnnotations"/>
-            <h2 class="text-white/60">Add Type Annotations</h2>
         </div>
 
         <div class="flex gap-2 items-center">

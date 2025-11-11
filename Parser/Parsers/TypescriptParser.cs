@@ -37,7 +37,6 @@ public sealed class TypescriptParser : IParser
             ft.FormatLine(token.Identifier!, token.Type!);
         }
 
-
         return ft.GetResult();
     }
        
