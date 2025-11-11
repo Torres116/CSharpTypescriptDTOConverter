@@ -8,14 +8,14 @@
         <h2 class="text-white">Conversion Format</h2>
         
         <Dropdown Options="_typeDeclarationOptions" Title="Typescript Output Component" 
-                  OnValueChange="OnTypeDeclarationChange"/>
+                  OnValueChange="OnTypeDeclarationChange" T="string"/>
         
         <Dropdown Options="_namingConvention" Title="Naming Convention"
-                  OnValueChange="OnNamingConventionChange" />
+                  OnValueChange="OnNamingConventionChange" T="string" />
         
         <div class="flex w-full gap-2">
-            <Dropdown Options="_tabSize" Title="Tab Size" OnValueChange="OnTabSizeChanged"/>
-            <Dropdown Options="_identSize" Title="Ident Size" OnValueChange="OnIdentSizeChanged"/>
+            <Dropdown Options="_tabSize" Title="Tab Size" T="int" OnValueChange="OnTabSizeChanged"/>
+            <Dropdown Options="_identSize" Title="Ident Size" T="int" OnValueChange="OnIdentSizeChanged"/>
         </div>
     </div>
 
@@ -62,35 +62,35 @@
 
     [Parameter] public EventCallback UpdateCallback { get; set; }
 
-    readonly List<DropdownOption> _typeDeclarationOptions = new()
+    readonly List<DropdownOption<string>> _typeDeclarationOptions = new()
     {
-        new DropdownOption("interface", 0),
-        new DropdownOption("type", 1),
-        new DropdownOption("class", 2)
+        new DropdownOption<string>("interface", 0),
+        new DropdownOption<string>("type", 1),
+        new DropdownOption<string>("class", 2)
     };
 
-    readonly List<DropdownOption> _namingConvention = new()
+    readonly List<DropdownOption<string>> _namingConvention = new()
     {
-        new DropdownOption("CamelCase", 0),
-        new DropdownOption("PascalCase", 1),
-        new DropdownOption("SnakeCase", 2)
+        new DropdownOption<string>("CamelCase", 0),
+        new DropdownOption<string>("PascalCase", 1),
+        new DropdownOption<string>("SnakeCase", 2)
     };
     
-    readonly List<DropdownOption> _tabSize = new()
+    readonly List<DropdownOption<int>> _tabSize = new()
     {
-        new DropdownOption("2", 0),
-        new DropdownOption("4", 1),
-        new DropdownOption("8", 2)
+        new DropdownOption<int>(2, 0),
+        new DropdownOption<int>(4, 1),
+        new DropdownOption<int>(8, 2)
     };
     
-    readonly List<DropdownOption> _identSize = new()
+    readonly List<DropdownOption<int>> _identSize = new()
     {
-        new DropdownOption("2", 0),
-        new DropdownOption("4", 1),
-        new DropdownOption("8", 2)
+        new DropdownOption<int>(2, 0),
+        new DropdownOption<int>(4, 1),
+        new DropdownOption<int>(8, 2)
     };
 
-    void OnTypeDeclarationChange(DropdownOption option)
+    void OnTypeDeclarationChange(DropdownOption<string> option)
     {
         switch (option.Value)
         {
@@ -107,7 +107,7 @@
         Update();
     }
 
-    void OnNamingConventionChange(DropdownOption option)
+    void OnNamingConventionChange(DropdownOption<string> option)
     {
         switch (option.Value)
         {
@@ -128,20 +128,16 @@
         Update();
     }
 
-    void OnTabSizeChanged(DropdownOption option)
+    void OnTabSizeChanged(DropdownOption<int> option)
     {
-        if (!int.TryParse(option.Value, out var val)) return;
-
-        FormatOptions.TabSize = val;
+        FormatOptions.TabSize = option.Value;
         StateHasChanged();
         Update();
     }
     
-    void OnIdentSizeChanged(DropdownOption option)
+    void OnIdentSizeChanged(DropdownOption<int> option)
     {
-        if (!int.TryParse(option.Value, out var val)) return;
-
-        FormatOptions.IdentSize = val;
+        FormatOptions.IdentSize = option.Value;
         StateHasChanged();
         Update();
     }

@@ -4,7 +4,7 @@ namespace Formatter.Options;
 
 public static class FormatOptions
 {
-    public static int TabSize { get; set; } = 4;
+    public static int TabSize { get; set; } = 2;
     public static int IdentSize { get; set; } = 2;
     public static int IdentLevel { get; set; } = 1;
 

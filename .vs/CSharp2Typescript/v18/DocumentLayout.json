@@ -1,0 +1,41 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\JTorres\\Documents\\Projetos\\CSharp2Typescript\\CSharp2Typescript\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{C6B6273C-23EF-4122-8CA5-E44B84AB4970}|TokenGenerator\\TokenGenerator.csproj|c:\\users\\jtorres\\documents\\projetos\\csharp2typescript\\csharp2typescript\\tokengenerator\\typescripttokengenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{C6B6273C-23EF-4122-8CA5-E44B84AB4970}|TokenGenerator\\TokenGenerator.csproj|solutionrelative:tokengenerator\\typescripttokengenerator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{c6f34f0d-7ae5-4f3a-be61-fe0c21ae9eb8}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "TypescriptTokenGenerator.cs",
+              "DocumentMoniker": "C:\\Users\\JTorres\\Documents\\Projetos\\CSharp2Typescript\\CSharp2Typescript\\TokenGenerator\\TypescriptTokenGenerator.cs",
+              "RelativeDocumentMoniker": "TokenGenerator\\TypescriptTokenGenerator.cs",
+              "ToolTip": "C:\\Users\\JTorres\\Documents\\Projetos\\CSharp2Typescript\\CSharp2Typescript\\TokenGenerator\\TypescriptTokenGenerator.cs",
+              "RelativeToolTip": "TokenGenerator\\TypescriptTokenGenerator.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAqwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-09T01:04:51.095Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

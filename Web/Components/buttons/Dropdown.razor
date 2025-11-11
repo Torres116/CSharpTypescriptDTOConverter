@@ -1,10 +1,12 @@
 @using Web.wwwroot.svg
+@typeparam T
+
 <link href="css/dropdown.css" rel="stylesheet" />
 
 
 <div class="block relative text-sm lg:min-w-[140px]">
     
-    <h2 class="text-white py-1 ">@Title</h2>
+    <h2 class="text-white/60 py-1 ">@Title</h2>
     
     <div class="block border border-white/10 rounded-lg bg-[#1a1a1a] overflow-y-scroll">
         
@@ -12,7 +14,7 @@
             <h3 class="text-white px-2">@Options[currentIndex].Value</h3>
             <div class="transition-transform duration-100 @(IsOpen ? "rotate-45" : "rotate-0")">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2"
+                     stroke="#fff" stroke-width="2"
                      stroke-linecap="round" stroke-linejoin="round">
                     <path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 5l0 14"/><path d="M5 12l14 0"/>
                 </svg>
@@ -27,7 +29,7 @@
         @foreach (var option in Options.Where(c => c.Index != currentIndex))
         {
             <button class="flex flex-row items-center w-full h-10 hover:bg-gray-100/10"
-                    @onclick="async () => await OnOptionSelected(option)">
+                    @onclick="()=> OnOptionSelected(option)">
                 <h3 class="text-white px-2 text-md">@option.Value</h3>
             </button>
         }
@@ -39,10 +41,11 @@
 
 @code {
 
-    [Parameter] public string Title { get; set; } = string.Empty;
-    [Parameter] public List<DropdownOption> Options { get; set; } = [];
-    [Parameter] public EventCallback<DropdownOption> OnValueChange { get; set; }
     
+    
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public List<DropdownOption<T>> Options { get; set; } = [];
+    [Parameter] public EventCallback<DropdownOption<T>> OnValueChange { get; set; }
 
     private int currentIndex;
     private bool IsOpen;
@@ -52,7 +55,7 @@
         IsOpen = !IsOpen;
     }
 
-    private async Task OnOptionSelected(DropdownOption option)
+    private async void OnOptionSelected(DropdownOption<T> option)
     {
         if (OnValueChange.HasDelegate)
         {
@@ -60,7 +63,7 @@
             await OnValueChange.InvokeAsync(option);
             StateHasChanged();
         }
-        
+
         IsOpen = false;
     }
 

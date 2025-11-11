@@ -1,14 +1,16 @@
+@using Web.Components.TextContainer
 @using Web.wwwroot.svg
 @inject IJSRuntime JS
 
 
-<div class="lg:max-w-[700px] lg:min-h-[560px] xl:min-h-[700px] flex-grow flex flex-col border border-white/10 rounded-lg bg-[#222222] overflow-clip">
+<div
+    class="lg:max-w-[700px] lg:min-h-[560px] xl:min-h-[700px] flex-grow flex flex-col border border-white/10 rounded-lg bg-[#222222] overflow-clip">
     <div class="w-full h-14 p-4 flex items-center justify-between border-b border-white/10">
         <div class="flex gap-2 items-center">
             <img src="@Config.LogoPath" alt="Logo" class="h-6 w-6"/>
             <h1 class="text-lg">@Config.Title</h1>
         </div>
-        
+
         <button class="flex items-center hover:opacity-70 hover:bg-gray-100/10 p-[6px] rounded-lg ">
             <CopySVG/>
         </button>
@@ -19,7 +21,8 @@
         {
             <div class="h-full w-full flex p-2 overflow-auto">
                 <pre class="w-full h-full p-0 m-0">
-                    <code class="language-typescript bg-transparent text-md xl:text-lg whitespace-pre font-mono">@Text</code>
+                    <code
+                        class="language-typescript bg-transparent text-md xl:text-lg whitespace-pre font-mono">@Text</code>
                 </pre>
             </div>
         }
@@ -27,19 +30,19 @@
         {
             <textarea class="w-full p-2 bg-transparent text-white/90 font-mono text-md xl:text-lg
             resize-none focus:outline-none"
-            spellcheck="false"
-            autocapitalize="off"
-            autocomplete="off"
-            autocorrect="off"
-            readonly="@Config.IsReadOnly"
-            onchange="@OnTextAreaChange">@Text</textarea>
+                      spellcheck="false"
+                      autocapitalize="off"
+                      autocomplete="off"
+                      autocorrect="off"
+                      readonly="@Config.IsReadOnly"
+                      onchange="@OnTextAreaChange">@Text</textarea>
         }
     </div>
-    
+
     <div class="flex items-center p-4 border-t border-white/10 h-10 w-full bg-[#1a1a1a]">
         <span class="text-xs text-white/40">@($"{Text?.Length ?? 0} characters")</span>
     </div>
-    
+
 </div>
 
 
@@ -49,14 +52,6 @@
     [Parameter] public string Text { get; set; }
     [Parameter] public required EditorConfig Config { get; set; }
     [Parameter] public EventCallback<string> OnChange { get; set; }
-    
-    
-    
-    private async void OnTextAreaChange(ChangeEventArgs e)
-    {
-        if (!Config.IsReadOnly)
-            await OnChange.InvokeAsync(e.Value?.ToString());
-    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -64,6 +59,12 @@
         {
             await JS.InvokeVoidAsync("highlightCodeBlocks");
         }
+    }
+
+    private async Task OnTextAreaChange(ChangeEventArgs e)
+    {
+        if (!Config.IsReadOnly)
+            await OnChange.InvokeAsync(e.Value?.ToString());
     }
 
 }
