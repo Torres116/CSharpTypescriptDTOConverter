@@ -74,16 +74,15 @@ public class TypescriptFormatter : IFormatter
         sb.Append(';');
         sb.AppendLine();
     }
-    
+
     public void FormatComment(string comment)
     {
         Console.WriteLine("A");
         sb.Append(GetIdent());
-        sb.Append("// ");
+        sb.Append("//");
         sb.Append(comment);
         sb.AppendLine();
     }
-  
 
     public string GetResult()
     {

@@ -83,7 +83,7 @@ internal sealed class Lexer
                     
                     if(current.StartsWith("//") && j == 0)
                     {
-                        string comment = string.Join("", currentLine).Replace("//", "");
+                        string comment = string.Join(" ", currentLine).Replace("//", "");
                         token.IsComment = true;
                         token.Comment = comment;
                         break;

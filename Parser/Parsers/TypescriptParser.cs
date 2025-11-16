@@ -10,8 +10,8 @@ public sealed class TypescriptParser : IParser
     public Task<string> Parse(List<Token> tokens)
     {
         var generator = new TypescriptTokenGenerator();
-        var tsTokens = tokens.Select(token => generator.InterpretToken(token)).ToList();
-        var result = Build(tsTokens);
+        var tsTokens = tokens.Select(token => generator.InterpretToken(token));
+        var result = Build(tsTokens.Where(token => token != null).ToList()!);
         return Task.FromResult(result);
     }
 

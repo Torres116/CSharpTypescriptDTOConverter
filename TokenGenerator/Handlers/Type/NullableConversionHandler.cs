@@ -7,6 +7,9 @@ public class NullableConversionHandler(ITokenGenerator generator) : ITokenHandle
 {
     public void Verify(TypescriptToken token)
     {
+        if (token.Skip)
+            return;
+        
         var result = token.Type.ValidateNullableFormat();
         token.IsNull = result;
     }

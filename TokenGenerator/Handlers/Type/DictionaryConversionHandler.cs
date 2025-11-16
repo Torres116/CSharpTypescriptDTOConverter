@@ -20,8 +20,8 @@ public class DictionaryConversionHandler(ITokenGenerator generator) : ITokenHand
         var type1 = types.Split(",")[0].Trim();
         var type2 = types.Split(",")[1].Trim();
         
-        type1 = generator.ConvertType(new TypescriptToken { Type = type1, Identifier = ""}).Type;
-        type2 = generator.ConvertType(new TypescriptToken { Type = type2, Identifier = ""}).Type;
+        type1 = generator.ConvertType(new TypescriptToken { Type = type1, Identifier = "",Skip = true}).Type;
+        type2 = generator.ConvertType(new TypescriptToken { Type = type2, Identifier = "",Skip = true}).Type;
         
         token.Type = $"Record<{type1},{type2}>";
     }

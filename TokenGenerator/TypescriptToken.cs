@@ -7,4 +7,5 @@ public class TypescriptToken : Token
     public bool IsDate;
     public bool IsArray;
     public bool IsDictionary;
+    public bool Skip;
 }

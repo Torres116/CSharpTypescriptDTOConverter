@@ -1,4 +1,5 @@
 using Formatter.Formatter;
+using Formatter.Options;
 using TokenGenerator.Handlers;
 using TokenGenerator.Handlers.Identifier;
 using TokenGenerator.Handlers.Type;
@@ -38,7 +39,7 @@ public class TypescriptTokenGenerator : ITokenGenerator
         };
     }
 
-    public TypescriptToken InterpretToken(Token token)
+    public TypescriptToken? InterpretToken(Token token)
     {
         var result = new TypescriptToken
         {
@@ -48,9 +49,12 @@ public class TypescriptTokenGenerator : ITokenGenerator
             Comment = token.Comment
         };
         
-        if (token.IsComment)
-            return result;
-        
+        switch (token.IsComment)
+        {
+            case true when FormatOptions.IncludeComments: return result;
+            case true: return null;
+        }
+
         ConvertType(result);
         ConvertIdentifier(result);
         CleanupHandler.Cleanup(result);
