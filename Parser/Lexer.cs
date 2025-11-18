@@ -74,6 +74,7 @@ internal sealed class Lexer
                         var next = currentLine[j + 1];
                         token.Type = current;
                         token.Identifier = next;
+                        token.IsDeclaration = true;
                         break;
                     }
                     

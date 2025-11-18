@@ -1,5 +1,5 @@
 using Formatter.Configuration;
-using Formatter.Formatter;
+using Formatter.Configuration.utils;
 using TokenGenerator.Handlers;
 using TokenGenerator.Handlers.Identifier;
 using TokenGenerator.Handlers.Type;
@@ -46,7 +46,8 @@ public class TypescriptTokenGenerator : ITokenGenerator
             Identifier = token.Identifier ?? "",
             Type = token.Type ?? "",
             IsComment = token.IsComment,
-            Comment = token.Comment
+            Comment = token.Comment,
+            IsDeclaration = token.IsDeclaration
         };
         
         switch (token.IsComment)

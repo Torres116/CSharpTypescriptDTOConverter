@@ -4,7 +4,7 @@ public static class NamingConventionHandler
 {
     public static string ToCamelCase(string str)
     {
-        string temp = str[0].ToString().ToLower();
+        var result = str[0].ToString().ToLower();
         for (var i = 1; i < str.Length; i++)
         {
             if (str[i] == '_')
@@ -12,19 +12,19 @@ public static class NamingConventionHandler
                 while (i < str.Length && str[i] == '_')
                     i++;
                 
-                temp += char.ToUpper(str[i]);
+                result += char.ToUpper(str[i]);
                 continue;
             }
             
-            temp += str[i];
+            result += str[i];
         }
 
-        return temp;
+        return result;
     }
 
     public static string ToPascalCase(string str)
     {
-        string temp = str[0].ToString().ToUpper();
+        var result = str[0].ToString().ToUpper();
         for (var i = 1; i < str.Length; i++)
         {
             if (str[i] == '_')
@@ -32,21 +32,20 @@ public static class NamingConventionHandler
                 while (i < str.Length && str[i] == '_')
                     i++;
                 
-                temp += char.ToUpper(str[i]);
+                result += char.ToUpper(str[i]);
                 continue;
             }
             
-            temp += str[i];
+            result += str[i];
         }
 
-        return temp;
+        return result;
     }
 
     public static string ToSnakeCase(string str)
     {
-        string result = "";
-        if(str.Contains("_"))
-            str = ToPascalCase(str);
+        var result = "";
+        str = ToPascalCase(str);
         
         for (var i = 0; i < str.Length; i++)
         {

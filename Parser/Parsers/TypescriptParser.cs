@@ -10,7 +10,7 @@ public sealed class TypescriptParser : IParser
     public Task<string> Parse(List<Token> tokens)
     {
         var generator = new TypescriptTokenGenerator();
-        var tsTokens = tokens.Select(token => generator.InterpretToken(token));
+        var tsTokens = tokens.Select(token => generator.InterpretToken(token)).Where(t => t != null).ToList();
         var result = Build(tsTokens.Where(token => token != null).ToList()!);
         return Task.FromResult(result);
     }
@@ -19,25 +19,10 @@ public sealed class TypescriptParser : IParser
     {
         var ft = new TypescriptFormatter();
         
-        //TODO: Change this
-        foreach (var token in tokens)
-        {
-            if (token.IsComment)
-            {
-                ft.FormatComment(token.Comment!);
-                continue;
-            }
-            
-            
-            if (token.Type == "class")
-            {
-                ft.FormatTypeDeclaration(token.Identifier!);
-                continue;
-            }
-            
-            ft.FormatLine(token.Identifier!, token.Type!);
-        }
-
+        ft.Format(tokens
+            .Select(token => (token.Identifier, token.Type, token.IsComment, token.Comment, token.IsDeclaration))
+            .ToList());
+        
         return ft.GetResult();
     }
        

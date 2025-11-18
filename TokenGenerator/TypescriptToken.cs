@@ -8,4 +8,6 @@ public class TypescriptToken : Token
     public bool IsArray;
     public bool IsDictionary;
     public bool Skip;
+    public bool IsConstructor = false;
+    public bool IsConstructorParameter = false;
 }
