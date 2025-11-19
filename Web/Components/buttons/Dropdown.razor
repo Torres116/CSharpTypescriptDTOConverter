@@ -52,7 +52,7 @@
         IsOpen = !IsOpen;
     }
 
-    private async void OnOptionSelected(DropdownOption<T> option)
+    private async Task OnOptionSelected(DropdownOption<T> option)
     {
         if (OnValueChange.HasDelegate)
         {

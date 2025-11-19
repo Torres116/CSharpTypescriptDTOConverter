@@ -3,7 +3,7 @@ using TokenGenerator.Validation;
 
 namespace TokenGenerator.Handlers.Type;
 
-public class ListConversionHandler(ITokenGenerator generator) : ITokenHandler
+public sealed class ListConversionHandler(ITokenGenerator generator) : ITokenHandler
 {
     public void Verify(TypescriptToken token)
     {
@@ -17,6 +17,7 @@ public class ListConversionHandler(ITokenGenerator generator) : ITokenHandler
             return;
         
         token.Type = token.Type.Replace("List", "").Replace("<", "").Replace(">", "").Replace("[]","").Replace("?","");
+        token.Type = generator.ConvertType(new TypescriptToken { Type = token.Type }).Type;
         token.Type = $"{token.Type}[]";
     }
 }

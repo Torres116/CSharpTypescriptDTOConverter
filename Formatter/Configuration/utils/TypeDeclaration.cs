@@ -4,5 +4,5 @@ public enum TypeDeclaration
 {
     Interface,
     Class,
-    Enum
+    Type
 }

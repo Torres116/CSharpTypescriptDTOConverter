@@ -6,7 +6,7 @@ public static class FormatOptions
     [
        TypeDeclaration.Interface,
        TypeDeclaration.Class,
-       TypeDeclaration.Enum
+       TypeDeclaration.Type
     ];
 
     public static readonly List<NamingConvention> NamingConventions =

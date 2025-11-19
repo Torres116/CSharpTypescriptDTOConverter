@@ -4,16 +4,16 @@
 
 <section class="flex flex-row lg:flex-col w-full justify-center lg:justify-start md:max-w-[260px] xl:max-w-[300px] 
 gap-2 lg:gap-4 relative">
-    
+
     <div class="p-4 w-full flex flex-col gap-4 border border-white/10 rounded-lg bg-[#222222]">
         <h2 class="text-white">Conversion Format</h2>
-        
-        <Dropdown Options="_typeDeclarationOptions" Title="Typescript Output Component" 
+
+        <Dropdown Options="_typeDeclarationOptions" Title="Typescript Output Component"
                   OnValueChange="OnTypeDeclarationChange" T="TypeDeclaration"/>
-        
+
         <Dropdown Options="_namingConvention" Title="Naming Convention"
-                  OnValueChange="OnNamingConventionChange" T="NamingConvention" />
-        
+                  OnValueChange="OnNamingConventionChange" T="NamingConvention"/>
+
         <div class="flex flex-row flex-wrap xl:flex-nowrap w-full gap-2">
             <Dropdown Options="_tabSize" Title="Tab Size" T="int" OnValueChange="OnTabSizeChanged"/>
             <Dropdown Options="_identSize" Title="Ident Size" T="int" OnValueChange="OnIdentSizeChanged"/>
@@ -22,7 +22,7 @@ gap-2 lg:gap-4 relative">
 
     <div class="p-4 w-full flex flex-col gap-4 border border-white/10 rounded-lg bg-[#222222]">
         <h2 class="text-white">Conversion Options</h2>
-        
+
         <div class="flex gap-2 items-center">
             <Checkbox OnValueChange="OnGenerateConstructorChanged" InitialState="_generateConstructor"/>
             <h2 class="text-white/60">Generate Constructor</h2>
@@ -39,21 +39,21 @@ gap-2 lg:gap-4 relative">
         </div>
 
         <div class="flex gap-2 items-center">
-            <Checkbox OnValueChange="OnIncludeNullablesChanged" InitialState="_includeNullables"/>
+            <Checkbox OnValueChange="OnIncludeNullablesChanged" Update="@Update" InitialState="_includeNullables"/>
             <h2 class="text-white/60">Include Nullables</h2>
         </div>
-        
+
         <div class="flex gap-2 items-center">
-            <Checkbox OnValueChange="OnIncludeOptionalsChanged" InitialState="_includeOptionals"/>
+            <Checkbox OnValueChange="OnIncludeOptionalsChanged" Update="@Update"  InitialState="_includeOptionals"/>
             <h2 class="text-white/60">Include Optionals</h2>
         </div>
-        
+
     </div>
 </section>
 
 
 @code {
-    
+
     private readonly bool _generateConstructor = FormatConfiguration.GenerateConstructor;
     private readonly bool _datesAsStrings = FormatConfiguration.DatesAsStrings;
     private readonly bool _includeComments = FormatConfiguration.IncludeComments;
@@ -62,8 +62,8 @@ gap-2 lg:gap-4 relative">
 
     [Parameter] public EventCallback UpdateCallback { get; set; }
 
-    readonly List<DropdownOption<TypeDeclaration>> _typeDeclarationOptions = 
-        FormatOptions.TypeDeclarations.Select((val,idx) => new DropdownOption<TypeDeclaration>(val,idx)).ToList();
+    readonly List<DropdownOption<TypeDeclaration>> _typeDeclarationOptions =
+        FormatOptions.TypeDeclarations.Select((val, idx) => new DropdownOption<TypeDeclaration>(val, idx)).ToList();
 
     readonly List<DropdownOption<NamingConvention>> _namingConvention =
         FormatOptions.NamingConventions.Select((val, idx) => new DropdownOption<NamingConvention>(val, idx)).ToList();
@@ -91,7 +91,7 @@ gap-2 lg:gap-4 relative">
         FormatConfiguration.TabSize = option.Value;
         Update();
     }
-    
+
     void OnIdentSizeChanged(DropdownOption<int> option)
     {
         FormatConfiguration.IdentSize = option.Value;
@@ -103,31 +103,34 @@ gap-2 lg:gap-4 relative">
         FormatConfiguration.GenerateConstructor = value;
         Update();
     }
-    
+
     void OnDatesAsStringsChanged(bool value)
     {
         FormatConfiguration.DatesAsStrings = value;
         Update();
     }
-    
+
     void OnIncludeCommentsChanged(bool value)
     {
         FormatConfiguration.IncludeComments = value;
         Update();
     }
-    
+
     void OnIncludeNullablesChanged(bool value)
     {
         FormatConfiguration.IncludeNullables = value;
+        if (!value)
+            FormatConfiguration.IncludeOptionals = false;
+
         Update();
     }
-    
+
     void OnIncludeOptionalsChanged(bool value)
     {
         FormatConfiguration.IncludeOptionals = value;
         Update();
     }
-    
+
     async void Update()
     {
         try

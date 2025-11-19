@@ -16,7 +16,7 @@ public class TypescriptFormatter : IFormatter
         {
             TypeDeclaration.Class => "class",
             TypeDeclaration.Interface => "interface",
-            TypeDeclaration.Enum => "enum",
+            TypeDeclaration.Type => "type",
             _ => throw new ArgumentOutOfRangeException()
         };
     }
@@ -78,7 +78,7 @@ public class TypescriptFormatter : IFormatter
 
     public void FormatLine(string identifier, string type)
     {
-        if (FormatConfiguration.TypeDeclaration == TypeDeclaration.Enum)
+        if (FormatConfiguration.TypeDeclaration == TypeDeclaration.Type)
             return;
 
         if (string.IsNullOrWhiteSpace(identifier) || string.IsNullOrWhiteSpace(type))

@@ -7,7 +7,7 @@ using TokenGenerator.interfaces;
 
 namespace TokenGenerator;
 
-public class TypescriptTokenGenerator : ITokenGenerator
+public sealed class TypescriptTokenGenerator : ITokenGenerator
 {
     private List<ITokenHandler>? _typeHandlers;
     private List<ITokenHandler>? _identifierHandlers;
@@ -64,7 +64,7 @@ public class TypescriptTokenGenerator : ITokenGenerator
 
     public TypescriptToken ConvertType(TypescriptToken token)
     {
-        _primitiveMapper.Convert(token);
+        PrimitiveTypeMapper.Convert(token);
         
         foreach (var handler in _typeHandlers ?? [])
             handler.Verify(token);

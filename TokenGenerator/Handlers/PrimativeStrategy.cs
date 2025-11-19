@@ -1,6 +1,6 @@
 namespace TokenGenerator.Handlers;
 
-public class PrimitiveTypeMapper
+public sealed class PrimitiveTypeMapper
 {
     private static readonly Dictionary<string, string> Types = new()
     {
@@ -23,15 +23,24 @@ public class PrimitiveTypeMapper
         { "object", "any" },
     };
 
-    public void Convert(TypescriptToken token)
+    public static void Convert(TypescriptToken token)
     {
-        var type = token.Type?.Replace("[]", "").Replace("?", "").ToLower();
+        if (token.Type == null)
+            return;
+        
+        var type = token.Type?.Replace("?", "").Replace("[]","").ToLower();
         var result = Types!.GetValueOrDefault(type,null);
-        if (result != null && token.Type.Contains("?"))
+        
+        if (result != null)
         {
-            result += "?";
+            if(token.Type!.Contains("[]"))
+                result += "[]";
+            
+            if(token.Type.Contains('?'))
+                result += '?';
+            
             token.Type = result;
-        } else if (result != null)
-            token.Type = result;
+        } 
+        
     }
 }
