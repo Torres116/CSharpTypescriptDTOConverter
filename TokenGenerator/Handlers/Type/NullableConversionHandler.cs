@@ -1,3 +1,4 @@
+using Formatter.Configuration;
 using TokenGenerator.interfaces;
 using TokenGenerator.Validation;
 
@@ -16,7 +17,7 @@ public class NullableConversionHandler(ITokenGenerator generator) : ITokenHandle
 
     public void Convert(TypescriptToken token)
     {
-        if (!token.IsNull)
+        if (!token.IsNull || !FormatConfiguration.IncludeNullables)
             return;
         
         token.Type = token.Type.Replace("?", "");

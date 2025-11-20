@@ -11,13 +11,11 @@ public sealed class TypescriptTokenGenerator : ITokenGenerator
 {
     private List<ITokenHandler>? _typeHandlers;
     private List<ITokenHandler>? _identifierHandlers;
-    private readonly PrimitiveTypeMapper _primitiveMapper;
 
     public TypescriptTokenGenerator()
     {
         InitTypeHandlers();
         InitIdentifierHandlers();
-        _primitiveMapper = new();
     }
 
     private void InitTypeHandlers()

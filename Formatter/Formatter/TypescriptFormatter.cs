@@ -10,6 +10,20 @@ public class TypescriptFormatter : IFormatter
     private StringBuilder sb { get; } = new();
     private StringBuilder constructorSB { get; } = new();
 
+    public void FormatLine(string identifier, string type)
+    {
+        if (string.IsNullOrWhiteSpace(identifier) || string.IsNullOrWhiteSpace(type))
+            return;
+
+        identifier = FormatNamingConvention(identifier);
+
+        FormatConstructorParameter(identifier);
+
+        sb.Append(FormatIdentifier(identifier));
+        sb.Append(FormatType(type));
+        sb.AppendLine();
+    }
+
     private static string GetTypeDeclaration()
     {
         return FormatConfiguration.TypeDeclaration switch
@@ -19,6 +33,19 @@ public class TypescriptFormatter : IFormatter
             TypeDeclaration.Type => "type",
             _ => throw new ArgumentOutOfRangeException()
         };
+    }
+
+    private void FormatTypeDeclaration(string identifier)
+    {
+        AddExport();
+        var declaration = 
+            FormatConfiguration.TypeDeclaration == TypeDeclaration.Type
+            ? $"{GetTypeDeclaration()} {identifier} = {{"
+            : $"{GetTypeDeclaration()} {identifier} {{";
+
+        sb.Append(declaration);
+        sb.AppendLine();
+        InitializeConstructor(identifier);
     }
 
     private void AddExport()
@@ -31,7 +58,7 @@ public class TypescriptFormatter : IFormatter
         var ident = new string(' ', FormatConfiguration.IdentSize * FormatConfiguration.IdentLevel);
         return ident;
     }
-    
+
     private static string GetConstructorWhiteSpace()
     {
         var ident = new string(' ', 2);
@@ -42,15 +69,6 @@ public class TypescriptFormatter : IFormatter
     {
         var tab = new string(' ', tabSize ?? FormatConfiguration.TabSize);
         return tab;
-    }
-
-    public void FormatTypeDeclaration(string identifier)
-    {
-        AddExport();
-        var declaration = $"{GetTypeDeclaration()} {identifier} " + "{";
-        sb.Append(declaration);
-        sb.AppendLine();
-        InitializeConstructor(identifier);
     }
 
     private void EndTypeDeclaration()
@@ -76,29 +94,17 @@ public class TypescriptFormatter : IFormatter
         };
     }
 
-    public void FormatLine(string identifier, string type)
+    private string FormatIdentifier(string identifier)
     {
-        if (FormatConfiguration.TypeDeclaration == TypeDeclaration.Type)
-            return;
-
-        if (string.IsNullOrWhiteSpace(identifier) || string.IsNullOrWhiteSpace(type))
-            return;
-
-        identifier = FormatNamingConvention(identifier);
-
-        FormatConstructorParameter(identifier);
-
-        //TODO: Change this
-        sb.Append(GetIdent());
-        sb.Append(identifier);
-        sb.Append(':');
-        sb.Append(GetTab());
-        sb.Append(type);
-        sb.Append(';');
-        sb.AppendLine();
+        return $"{GetIdent()}{identifier}:";
     }
 
-    public void FormatComment(string comment)
+    private string FormatType(string type)
+    {
+        return $"{GetTab()}{type};";
+    }
+
+    private void FormatComment(string comment)
     {
         sb.Append(GetIdent());
         sb.Append("//");
@@ -125,7 +131,7 @@ public class TypescriptFormatter : IFormatter
             return;
 
         identifier = identifier.Replace("?", "");
-        
+
         var declaration = $"this.{identifier} =  init.{identifier}";
         constructorSB.Append(GetIdent());
         constructorSB.Append(GetConstructorWhiteSpace());
@@ -139,7 +145,8 @@ public class TypescriptFormatter : IFormatter
         return sb.ToString();
     }
 
-    public void Format(List<(string? Identifier, string? Type, bool IsComment,string? Comment, bool IsDeclaration)> tokens)
+    public void Format(
+        List<(string? Identifier, string? Type, bool IsComment, string? Comment, bool IsDeclaration)> tokens)
     {
         foreach (var token in tokens)
         {
@@ -148,15 +155,14 @@ public class TypescriptFormatter : IFormatter
                 FormatComment(token.Comment ?? "");
                 continue;
             }
-            
+
             if (token.IsDeclaration)
             {
                 FormatTypeDeclaration(token.Identifier!);
                 continue;
             }
-            
+
             FormatLine(token.Identifier!, token.Type!);
         }
     }
-    
 }

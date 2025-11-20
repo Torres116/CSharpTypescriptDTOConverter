@@ -29,7 +29,7 @@ public static class InputValidator
     public static bool ValidateNullableFormat(this string text)
     {
         const string pattern = @"^[A-Za-z]+\s*(?:<[^<>]+>)?\s*(?:\[\s*(?:,\s*)*\])?\?$";
-        return Regex.IsMatch(text, pattern, RegexOptions.IgnoreCase) && FormatConfiguration.IncludeNullables;
+        return Regex.IsMatch(text, pattern, RegexOptions.IgnoreCase);
     }
 
     public static bool ValidateDateFormat(this string text)
@@ -37,8 +37,4 @@ public static class InputValidator
         return text.Replace("?","") == "Date";
     }
     
-    public static bool ValidateOptionalFormat(this TypescriptToken token)
-    {
-        return token.IsNull && FormatConfiguration.IncludeOptionals;
-    }
 }

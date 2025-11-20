@@ -8,18 +8,16 @@ public class OptionalIdentifierHandler(ITokenGenerator generator) : ITokenHandle
 {
     public void Verify(TypescriptToken token)
     {
-        var result = FormatConfiguration.IncludeOptionals && token.ValidateOptionalFormat();
+        var result = token.IsNull;
         token.IsOptional = result;
     }
 
     public void Convert(TypescriptToken token)
     {
-        if (!token.IsOptional)
-        {
+        if (!token.IsOptional || !FormatConfiguration.IncludeOptionals)
             return;
-        }
-        
-        var identifier = token.Identifier.Trim();
+
+        var identifier = token.Identifier;
         identifier += "?";
         
         token.Identifier = identifier;
