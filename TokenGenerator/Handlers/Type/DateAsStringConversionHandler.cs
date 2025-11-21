@@ -4,7 +4,7 @@ using TokenGenerator.Validation;
 
 namespace TokenGenerator.Handlers.Type;
 
-public class DateAsStringConversionHandler(ITokenGenerator generator) : ITokenHandler
+internal sealed class DateAsStringConversionHandler(ITokenGenerator generator) : ITokenHandler
 {
     public void Verify(TypescriptToken token)
     {

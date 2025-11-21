@@ -3,7 +3,7 @@ using TokenGenerator.Validation;
 
 namespace TokenGenerator.Handlers.Type;
 
-public sealed class ListConversionHandler(ITokenGenerator generator) : ITokenHandler
+internal sealed class ListConversionHandler(ITokenGenerator generator) : ITokenHandler
 {
     public void Verify(TypescriptToken token)
     {

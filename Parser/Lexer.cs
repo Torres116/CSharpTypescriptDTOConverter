@@ -118,7 +118,10 @@ internal sealed class Lexer
                     }
 
                     if (token.Type == null && currentLine.Length - 1 > j)
+                    {
                         token.Type = current;
+                        continue;
+                    }
 
                     token.Identifier = current.Replace(",","");
                 }
@@ -132,8 +135,7 @@ internal sealed class Lexer
             Console.WriteLine(e);
             return [];
         }
-
-        result.ForEach(c => Console.WriteLine(c.Identifier));
+        
         return result;
     }
 

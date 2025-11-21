@@ -23,9 +23,10 @@ public sealed class TypescriptTokenGenerator : ITokenGenerator
         _typeHandlers = new()
         {
             new DateAsStringConversionHandler(this),
-            new DictionaryConversionHandler(this),
             new ListConversionHandler(this),
-            new NullableConversionHandler(this)
+            new CustomTypeHandler(),
+            new DictionaryConversionHandler(this),
+            new NullableConversionHandler(this),
         };
     }
 
@@ -45,7 +46,8 @@ public sealed class TypescriptTokenGenerator : ITokenGenerator
             Type = token.Type ?? "",
             IsComment = token.IsComment,
             Comment = token.Comment,
-            IsDeclaration = token.IsDeclaration
+            IsDeclaration = token.IsDeclaration,
+            IsCustomType = token.IsCustomType 
         };
         
         switch (token.IsComment)

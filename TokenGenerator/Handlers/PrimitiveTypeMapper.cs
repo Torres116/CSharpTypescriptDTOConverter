@@ -1,8 +1,8 @@
 namespace TokenGenerator.Handlers;
 
-public sealed class PrimitiveTypeMapper
+internal sealed class PrimitiveTypeMapper
 {
-    private static readonly Dictionary<string, string> Types = new()
+    public static readonly Dictionary<string, string> Types = new()
     {
         { "string", "string" },
         { "guid", "string" },
@@ -27,20 +27,20 @@ public sealed class PrimitiveTypeMapper
     {
         if (token.Type == null)
             return;
-        
-        var type = token.Type?.Replace("?", "").Replace("[]","").ToLower();
-        var result = Types!.GetValueOrDefault(type,null);
-        
+
+        var type = token.Type?.Replace("?", "").Replace("[]", "").ToLower();
+        var result = Types!.GetValueOrDefault(type, null);
+
         if (result != null)
         {
-            if(token.Type!.Contains("[]"))
+            if (token.Type!.Contains("[]"))
                 result += "[]";
-            
-            if(token.Type.Contains('?'))
+
+            if (token.Type.Contains('?'))
                 result += '?';
-            
+
             token.Type = result;
-        } 
-        
+        }
+
     }
 }

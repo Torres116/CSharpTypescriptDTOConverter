@@ -112,7 +112,6 @@
     private async Task PasteTextToArea()
     {
         var result = await JS.InvokeAsync<string>("pasteText");
-        Console.WriteLine($"result:{result}");
         if (string.IsNullOrEmpty(result))
             return;
 

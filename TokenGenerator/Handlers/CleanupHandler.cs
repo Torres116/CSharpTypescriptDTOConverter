@@ -2,7 +2,7 @@ using Formatter.Configuration;
 
 namespace TokenGenerator.Handlers;
 
-public sealed class CleanupHandler
+internal static class CleanupHandler
 {
     public static void Cleanup(Token token)
     {
@@ -10,5 +10,7 @@ public sealed class CleanupHandler
         
         if (!FormatConfiguration.IncludeOptionals)
             token.Identifier = token.Identifier!.Replace("?","");
+        
+        
     }
 }

@@ -4,7 +4,7 @@ using TokenGenerator.Validation;
 
 namespace TokenGenerator.Handlers.Type;
 
-public class NullableConversionHandler(ITokenGenerator generator) : ITokenHandler
+internal sealed class NullableConversionHandler(ITokenGenerator generator) : ITokenHandler
 {
     public void Verify(TypescriptToken token)
     {

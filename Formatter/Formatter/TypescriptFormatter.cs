@@ -5,10 +5,13 @@ using Formatter.Formatter.handlers;
 
 namespace Formatter.Formatter;
 
-public class TypescriptFormatter : IFormatter
+public sealed class TypescriptFormatter : IFormatter
 {
-    private StringBuilder sb { get; } = new();
-    private StringBuilder constructorSB { get; } = new();
+    private StringBuilder Sb { get; } = new();
+    private StringBuilder ConstructorSb { get; } = new();
+    private StringBuilder ImportsSb { get; } = new();
+    private StringBuilder Result { get; } = new();
+    private List<string>? CustomTypes;
 
     public void FormatLine(string identifier, string type)
     {
@@ -18,10 +21,9 @@ public class TypescriptFormatter : IFormatter
         identifier = FormatNamingConvention(identifier);
 
         FormatConstructorParameter(identifier);
-
-        sb.Append(FormatIdentifier(identifier));
-        sb.Append(FormatType(type));
-        sb.AppendLine();
+        Sb.Append(FormatIdentifier(identifier));
+        Sb.Append(FormatType(type));
+        Sb.AppendLine();
     }
 
     private static string GetTypeDeclaration()
@@ -38,19 +40,19 @@ public class TypescriptFormatter : IFormatter
     private void FormatTypeDeclaration(string identifier)
     {
         AddExport();
-        var declaration = 
+        var declaration =
             FormatConfiguration.TypeDeclaration == TypeDeclaration.Type
-            ? $"{GetTypeDeclaration()} {identifier} = {{"
-            : $"{GetTypeDeclaration()} {identifier} {{";
+                ? $"{GetTypeDeclaration()} {identifier} = {{"
+                : $"{GetTypeDeclaration()} {identifier} {{";
 
-        sb.Append(declaration);
-        sb.AppendLine();
+        Sb.Append(declaration);
+        Sb.AppendLine();
         InitializeConstructor(identifier);
     }
 
     private void AddExport()
     {
-        sb.Append("export ");
+        Sb.Append("export ");
     }
 
     private static string GetIdent()
@@ -59,9 +61,9 @@ public class TypescriptFormatter : IFormatter
         return ident;
     }
 
-    private static string GetConstructorWhiteSpace()
+    private static string GetWhiteSpace(int count = 1)
     {
-        var ident = new string(' ', 2);
+        var ident = new string(' ', count);
         return ident;
     }
 
@@ -73,14 +75,9 @@ public class TypescriptFormatter : IFormatter
 
     private void EndTypeDeclaration()
     {
-        if (FormatConfiguration.GenerateConstructor && FormatConfiguration.TypeDeclaration == TypeDeclaration.Class)
-        {
-            sb.Append(constructorSB);
-            sb.Append(GetIdent());
-            sb.AppendLine("}");
-        }
-
-        sb.Append("}");
+        AddConstructor();
+        Sb.Append("}");
+        Result.Append(Sb);
     }
 
     private static string FormatNamingConvention(string identifier)
@@ -106,10 +103,10 @@ public class TypescriptFormatter : IFormatter
 
     private void FormatComment(string comment)
     {
-        sb.Append(GetIdent());
-        sb.Append("//");
-        sb.Append(comment);
-        sb.AppendLine();
+        Sb.Append(GetIdent());
+        Sb.Append("//");
+        Sb.Append(comment);
+        Sb.AppendLine();
     }
 
     private void InitializeConstructor(string identifier)
@@ -119,10 +116,10 @@ public class TypescriptFormatter : IFormatter
 
         var declaration = $"constructor(init: {identifier}) {{ ";
 
-        constructorSB.AppendLine();
-        constructorSB.Append(GetIdent());
-        constructorSB.Append(declaration);
-        constructorSB.AppendLine();
+        ConstructorSb.AppendLine();
+        ConstructorSb.Append(GetIdent());
+        ConstructorSb.Append(declaration);
+        ConstructorSb.AppendLine();
     }
 
     private void FormatConstructorParameter(string identifier)
@@ -133,20 +130,57 @@ public class TypescriptFormatter : IFormatter
         identifier = identifier.Replace("?", "");
 
         var declaration = $"this.{identifier} =  init.{identifier}";
-        constructorSB.Append(GetIdent());
-        constructorSB.Append(GetConstructorWhiteSpace());
-        constructorSB.Append(declaration);
-        constructorSB.AppendLine(";");
+        ConstructorSb.Append(GetIdent());
+        ConstructorSb.Append(GetWhiteSpace());
+        ConstructorSb.Append(declaration);
+        ConstructorSb.AppendLine(";");
+    }
+
+    private void AddConstructor()
+    {
+        if (FormatConfiguration.GenerateConstructor && FormatConfiguration.TypeDeclaration == TypeDeclaration.Class)
+        {
+            Sb.Append(ConstructorSb);
+            Sb.Append(GetIdent());
+            Sb.AppendLine("}");
+        }
+    }
+
+    private void AddImport(string[] types)
+    {
+        if (!FormatConfiguration.IncludeImports)
+            return;
+
+        CustomTypes ??= new();
+
+        foreach (var type in types.Where(c => !CustomTypes.Contains(c)))
+        {
+            var str = $@"import type {type} from ""./{type}"";";
+            
+            CustomTypes.Add(type);
+            ImportsSb.AppendLine(str);
+        }
+    }
+
+    private void AddImports()
+    {
+        if (!FormatConfiguration.IncludeImports)
+            return;
+
+        ImportsSb.AppendLine();
+        Result.Append(ImportsSb);
     }
 
     public string GetResult()
     {
+        AddImports();
         EndTypeDeclaration();
-        return sb.ToString();
+        return Result.ToString();
     }
 
     public void Format(
-        List<(string? Identifier, string? Type, bool IsComment, string? Comment, bool IsDeclaration)> tokens)
+        List<(string? Identifier, string? Type, bool IsComment, string? Comment, bool IsDeclaration, bool IsCustomType,
+            string[]? CustomTypes)> tokens)
     {
         foreach (var token in tokens)
         {
@@ -162,7 +196,18 @@ public class TypescriptFormatter : IFormatter
                 continue;
             }
 
+            if (token.IsCustomType)
+                AddImport(token.CustomTypes ?? []);
+
             FormatLine(token.Identifier!, token.Type!);
         }
+    }
+
+    public void Reset()
+    {
+        Sb.Clear();
+        ImportsSb.Clear();
+        ConstructorSb.Clear();
+        CustomTypes = null;
     }
 }

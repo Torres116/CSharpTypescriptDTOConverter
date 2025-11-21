@@ -2,7 +2,7 @@ using TokenGenerator;
 
 namespace Parser.Interfaces;
 
-public interface IParser
+internal interface IParser
 {
     Task<string> Parse(List<Token> tokens);
 }

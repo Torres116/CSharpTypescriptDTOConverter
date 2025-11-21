@@ -13,8 +13,7 @@ public static class FormatConfiguration
     public static bool AddTypeAnnotations { get; set; } = true;
     public static bool DatesAsStrings { get; set; } = false;
     public static bool IncludeComments { get; set; } = false;
-    public static bool IncludeNullables { get; set; } = true;
-    public static bool IncludeOptionals { get; set; }
-    
-    
+    public static bool IncludeNullables { get; set; } = false;
+    public static bool IncludeOptionals { get; set; } = true;
+    public static bool IncludeImports { get; set; } = true;
 }

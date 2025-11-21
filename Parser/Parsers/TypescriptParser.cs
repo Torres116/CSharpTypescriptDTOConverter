@@ -4,9 +4,8 @@ using TokenGenerator;
 
 namespace Parser.Parsers;
 
-public sealed class TypescriptParser : IParser
+internal sealed class TypescriptParser : IParser
 {
-
     public Task<string> Parse(List<Token> tokens)
     {
         var generator = new TypescriptTokenGenerator();
@@ -18,12 +17,12 @@ public sealed class TypescriptParser : IParser
     string Build(List<TypescriptToken> tokens)
     {
         var ft = new TypescriptFormatter();
-        
+
         ft.Format(tokens
-            .Select(token => (token.Identifier, token.Type, token.IsComment, token.Comment, token.IsDeclaration))
+            .Select(token => (token.Identifier, token.Type, token.IsComment, token.Comment, token.IsDeclaration,
+                token.IsCustomType,token.CustomTypes))
             .ToList());
-        
+
         return ft.GetResult();
     }
-       
 }

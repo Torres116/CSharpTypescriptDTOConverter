@@ -39,13 +39,18 @@ gap-2 lg:gap-4 relative">
         </div>
 
         <div class="flex gap-2 items-center">
-            <Checkbox OnValueChange="OnIncludeNullablesChanged" Update="@Update" InitialState="_includeNullables"/>
+            <Checkbox OnValueChange="OnIncludeNullablesChanged" InitialState="_includeNullables"/>
             <h2 class="text-white/60">Include Nullables</h2>
         </div>
 
         <div class="flex gap-2 items-center">
-            <Checkbox OnValueChange="OnIncludeOptionalsChanged" Update="@Update"  InitialState="_includeOptionals"/>
+            <Checkbox OnValueChange="OnIncludeOptionalsChanged" InitialState="_includeOptionals"/>
             <h2 class="text-white/60">Include Optionals</h2>
+        </div>
+
+        <div class="flex gap-2 items-center">
+            <Checkbox OnValueChange="OnIncludeImportsChanged" InitialState="_includeImports"/>
+            <h2 class="text-white/60">Include Imports</h2>
         </div>
 
     </div>
@@ -59,6 +64,7 @@ gap-2 lg:gap-4 relative">
     private readonly bool _includeComments = FormatConfiguration.IncludeComments;
     private readonly bool _includeNullables = FormatConfiguration.IncludeNullables;
     private readonly bool _includeOptionals = FormatConfiguration.IncludeOptionals;
+    private readonly bool _includeImports = FormatConfiguration.IncludeImports;
 
     [Parameter] public EventCallback UpdateCallback { get; set; }
 
@@ -125,6 +131,12 @@ gap-2 lg:gap-4 relative">
     void OnIncludeOptionalsChanged(bool value)
     {
         FormatConfiguration.IncludeOptionals = value;
+        Update();
+    }
+    
+    void OnIncludeImportsChanged(bool value)
+    {
+        FormatConfiguration.IncludeImports = value;
         Update();
     }
 

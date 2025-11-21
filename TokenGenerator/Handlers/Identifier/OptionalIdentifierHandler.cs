@@ -4,7 +4,7 @@ using TokenGenerator.Validation;
 
 namespace TokenGenerator.Handlers.Identifier;
 
-public class OptionalIdentifierHandler(ITokenGenerator generator) : ITokenHandler
+internal class OptionalIdentifierHandler(ITokenGenerator generator) : ITokenHandler
 {
     public void Verify(TypescriptToken token)
     {

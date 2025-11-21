@@ -1,6 +1,6 @@
 namespace TokenGenerator.interfaces;
 
-public interface ITokenHandler
+internal interface ITokenHandler
 {
     void Verify(TypescriptToken token);
     void Convert(TypescriptToken token);

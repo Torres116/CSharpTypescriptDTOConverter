@@ -2,7 +2,7 @@ using Parser.Interfaces;
 
 namespace Parser.Parsers;
 
-public static class ParserFactory
+internal static class ParserFactory
 {
     public static IParser GetParser(string parser)
     {
@@ -10,7 +10,7 @@ public static class ParserFactory
         {
             "typescript" => new TypescriptParser(),
             "csharp" => throw new NotImplementedException(),
-            _ => throw new ArgumentOutOfRangeException(nameof(parser), parser,"parser doesn't exist")
+            _ => throw new ArgumentOutOfRangeException(nameof(parser), parser, "parser doesn't exist")
         };
     }
 }
