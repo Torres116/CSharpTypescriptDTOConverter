@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using TokenGenerator.interfaces;
 using TokenGenerator.utils;
 using TokenGenerator.Validation;

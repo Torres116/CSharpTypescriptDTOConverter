@@ -1,4 +1,5 @@
 using TokenGenerator.interfaces;
+using TokenGenerator.utils;
 
 namespace TokenGenerator.Handlers.Type;
 
@@ -21,6 +22,6 @@ internal sealed class CustomTypeHandler : ITokenHandler
         token.TokenCustomTypeSkip = true;
 
         if (token.IsCustomType)
-            token.CustomTypes = [type];
+            token.CustomTypes = [type.RemoveGenerics()];
     }
 }

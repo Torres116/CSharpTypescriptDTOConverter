@@ -7,4 +7,9 @@ public static class TokenUtils
         return type?.Replace("Dictionary", "").Replace("<", "").Replace(">", "");
     }
     
+    public static string? RemoveGenerics(this string? type)
+    {
+        return type?.Split("<").First();
+    }
+    
 }

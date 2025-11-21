@@ -1,6 +1,4 @@
 using System.Text.RegularExpressions;
-using Formatter.Configuration;
-using TokenGenerator.utils;
 
 namespace TokenGenerator.Validation;
 

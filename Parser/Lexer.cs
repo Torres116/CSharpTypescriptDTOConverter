@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using TokenGenerator;
-using TokenGenerator.utils;
 
 namespace Parser;
 
@@ -48,9 +47,7 @@ internal sealed partial class Lexer
         if (string.IsNullOrWhiteSpace(input))
             return [];
 
-
         input = RemoveSpaceAfter().Replace(input, "<"); // remove spaces after '<'
-        input = RemoveSpacesAroundComma().Replace(input, ","); // remove spaces around commas
         input = RemoveSpacesBefore().Replace(input, ">"); // remove spaces before '>'
 
         var result = new List<Token>();
@@ -69,25 +66,26 @@ internal sealed partial class Lexer
             {
                 var current = declaration[index].Replace("{", "").Replace("}", "").Replace("(", "").Replace(")", "");
                 var next = declaration[index + 1].Replace("{", "").Replace("}", "").Replace("(", "").Replace(")", "");
-                if (_declarationKeywords.Contains(current.ToLower()))
+
+                if (!_declarationKeywords.Contains(current.ToLower()))
+                    continue;
+
+                Token token = new()
                 {
-                    Token token = new()
-                    {
-                        Type = current,
-                        Identifier = next,
-                        IsDeclaration = true
-                    };
+                    Type = current,
+                    Identifier = next,
+                    IsDeclaration = true
+                };
 
-                    typeDeclaration = current switch
-                    {
-                        "class" => TypeDeclaration.CLASS,
-                        "record" => TypeDeclaration.RECORD,
-                        _ => typeDeclaration
-                    };
+                typeDeclaration = current switch
+                {
+                    "class" => TypeDeclaration.CLASS,
+                    "record" => TypeDeclaration.RECORD,
+                    _ => typeDeclaration
+                };
 
-                    result.Add(token);
-                    break;
-                }
+                result.Add(token);
+                break;
             }
 
             if (typeDeclaration == TypeDeclaration.NONE)
@@ -101,6 +99,7 @@ internal sealed partial class Lexer
                 for (var j = 0; j < currentLine.Length; j++)
                 {
                     var current = currentLine[j];
+
                     if (string.IsNullOrWhiteSpace(current))
                         break;
 
@@ -136,19 +135,23 @@ internal sealed partial class Lexer
 
     private string[] GetCurrentLineArray(string input, TypeDeclaration type)
     {
-        return type switch
+        switch (type)
         {
-            TypeDeclaration.CLASS => input.Split([" "], StringSplitOptions.RemoveEmptyEntries)
-                .Where(c => !ignoredKeywords.Contains(c))
-                .Select(c => c.Replace("{", "").Replace("}", ""))
-                .ToArray(),
-
-            TypeDeclaration.RECORD => input.Split([" "], StringSplitOptions.RemoveEmptyEntries)
-                .Where(c => !ignoredKeywords.Contains(c))
-                .Select(c => c.Replace("{", "").Replace("}", "").Replace("(", "").Replace(")", "").Replace(":", ""))
-                .ToArray(),
-            _ => []
-        };
+            case TypeDeclaration.CLASS:
+                return input.Split([" "], StringSplitOptions.RemoveEmptyEntries)
+                    .Where(c => !ignoredKeywords.Contains(c))
+                    .Select(c => c.Replace("{", "").Replace("}", ""))
+                    .ToArray();
+            
+            case TypeDeclaration.RECORD:
+                input = RemoveSpacesAroundComma().Replace(input, ",");
+                return input.Split([" "], StringSplitOptions.RemoveEmptyEntries)
+                    .Where(c => !ignoredKeywords.Contains(c))
+                    .Select(c => c.Replace("{", "").Replace("}", "").Replace("(", "").Replace(")", "").Replace(":", ""))
+                    .ToArray();
+            default:
+                return [];
+        }
     }
 
     [GeneratedRegex(@"<\s*")]

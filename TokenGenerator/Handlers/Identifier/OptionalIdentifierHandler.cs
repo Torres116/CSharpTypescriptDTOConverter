@@ -1,6 +1,5 @@
 using Formatter.Configuration;
 using TokenGenerator.interfaces;
-using TokenGenerator.Validation;
 
 namespace TokenGenerator.Handlers.Identifier;
 
