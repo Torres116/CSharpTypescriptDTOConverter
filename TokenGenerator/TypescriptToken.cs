@@ -10,4 +10,5 @@ public class TypescriptToken : Token
     public bool Skip = false;
     public bool TokenCustomTypeSkip = false;
     public string[]? CustomTypes;
+    public bool SkipDictionary = false;
 }

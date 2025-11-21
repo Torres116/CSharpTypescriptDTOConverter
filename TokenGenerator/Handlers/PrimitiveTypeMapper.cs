@@ -21,6 +21,7 @@ internal sealed class PrimitiveTypeMapper
         { "ulong", "number" },
         { "ushort", "number" },
         { "object", "any" },
+        // { "dictionary", "record" }
     };
 
     public static void Convert(TypescriptToken token)

@@ -17,9 +17,6 @@ internal class OptionalIdentifierHandler(ITokenGenerator generator) : ITokenHand
         if (!token.IsOptional || !FormatConfiguration.IncludeOptionals)
             return;
 
-        var identifier = token.Identifier;
-        identifier += "?";
-        
-        token.Identifier = identifier;
+        token.Identifier = $"{token.Identifier}?";
     }
 }

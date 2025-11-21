@@ -20,7 +20,7 @@ internal sealed class NullableConversionHandler(ITokenGenerator generator) : ITo
         if (!token.IsNull || !FormatConfiguration.IncludeNullables)
             return;
         
-        token.Type = token.Type.Replace("?", "");
-        token.Type += " | null";
+        token.Type = token.Type?.Replace("?", "");
+        token.Type = $"{token.Type} | null";
     }
 }

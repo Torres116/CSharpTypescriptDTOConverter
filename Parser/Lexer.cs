@@ -1,9 +1,10 @@
 using System.Text.RegularExpressions;
 using TokenGenerator;
+using TokenGenerator.utils;
 
 namespace Parser;
 
-internal sealed class Lexer
+internal sealed partial class Lexer
 {
     readonly string[] ignoredKeywords =
     [
@@ -42,10 +43,15 @@ internal sealed class Lexer
         NONE
     }
 
-    public  List<Token> Tokenize(string input)
+    public List<Token> Tokenize(string input)
     {
         if (string.IsNullOrWhiteSpace(input))
             return [];
+
+
+        input = RemoveSpaceAfter().Replace(input, "<"); // remove spaces after '<'
+        input = RemoveSpacesAroundComma().Replace(input, ","); // remove spaces around commas
+        input = RemoveSpacesBefore().Replace(input, ">"); // remove spaces before '>'
 
         var result = new List<Token>();
         var separators = new[] { "\n" };
@@ -53,11 +59,6 @@ internal sealed class Lexer
             .Split(separators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Select(c => c.Replace(";", "").Replace("\n", "").Replace("\t", ""))
             .ToArray();
-
-        // Remove generic whitespaces
-        const string genericTypePattern = @"(?<=<[^>]*)\s+(?=[^<]*>)";
-        for (var k = 0; k < formattedInput.Length; k++)
-            formattedInput[k] = Regex.Replace(formattedInput[k], genericTypePattern, "");
 
         var typeDeclaration = TypeDeclaration.NONE;
 
@@ -111,19 +112,13 @@ internal sealed class Lexer
                         break;
                     }
 
-                    if (_tokenType.Contains(current.ToLower()))
+                    if (_tokenType.Contains(current.ToLower()) || token.Type == null && currentLine.Length - 1 > j)
                     {
                         token.Type = current;
                         continue;
                     }
 
-                    if (token.Type == null && currentLine.Length - 1 > j)
-                    {
-                        token.Type = current;
-                        continue;
-                    }
-
-                    token.Identifier = current.Replace(",","");
+                    token.Identifier = current.Replace(",", "");
                 }
 
                 if (token is not { Type: null, Identifier: null } || token.IsComment)
@@ -135,28 +130,33 @@ internal sealed class Lexer
             Console.WriteLine(e);
             return [];
         }
-        
+
         return result;
     }
 
-    private string[] GetCurrentLineArray(string input, TypeDeclaration _t)
+    private string[] GetCurrentLineArray(string input, TypeDeclaration type)
     {
-        switch (_t)
+        return type switch
         {
-            case TypeDeclaration.CLASS:
-                return input.Split([" "], StringSplitOptions.RemoveEmptyEntries)
-                    .Where(c => !ignoredKeywords.Contains(c))
-                    .Select(c => c.Replace("{", "").Replace("}", ""))
-                    .ToArray();
-            
-            case TypeDeclaration.RECORD:
-                return input.Split([" "], StringSplitOptions.RemoveEmptyEntries)
-                    .Where(c => !ignoredKeywords.Contains(c))
-                    .Select(c => c.Replace("{", "").Replace("}", "").Replace("(", "")
-                        .Replace(")", "").Replace(":", ""))
-                    .ToArray();
-            default:
-                return [];
-        }
+            TypeDeclaration.CLASS => input.Split([" "], StringSplitOptions.RemoveEmptyEntries)
+                .Where(c => !ignoredKeywords.Contains(c))
+                .Select(c => c.Replace("{", "").Replace("}", ""))
+                .ToArray(),
+
+            TypeDeclaration.RECORD => input.Split([" "], StringSplitOptions.RemoveEmptyEntries)
+                .Where(c => !ignoredKeywords.Contains(c))
+                .Select(c => c.Replace("{", "").Replace("}", "").Replace("(", "").Replace(")", "").Replace(":", ""))
+                .ToArray(),
+            _ => []
+        };
     }
+
+    [GeneratedRegex(@"<\s*")]
+    private static partial Regex RemoveSpaceAfter();
+
+    [GeneratedRegex(@"\s*,\s*")]
+    private static partial Regex RemoveSpacesAroundComma();
+
+    [GeneratedRegex(@"\s*>")]
+    private static partial Regex RemoveSpacesBefore();
 }
