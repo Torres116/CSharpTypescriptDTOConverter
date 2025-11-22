@@ -13,6 +13,7 @@ public sealed class TypescriptFormatter : IFormatter
     private StringBuilder Result { get; } = new();
     private List<string>? CustomTypes;
     private List<string> Ignored { get; } = new();
+    private bool HasOpenType { get; set; }
 
     private void FormatLine(string identifier, string type)
     {
@@ -40,14 +41,12 @@ public sealed class TypescriptFormatter : IFormatter
 
     private void FormatTypeDeclaration(string identifier)
     {
-        Ignored.Add(identifier);
-        if (Sb.Length > 0)
-        {
-            Sb.AppendLine("}");
-            Sb.AppendLine();
-        }
+        if (HasOpenType)
+            EndTypeDeclaration();
 
+        Ignored.Add(identifier);
         AddExport();
+
         var declaration =
             FormatConfiguration.TypeDeclaration == TypeDeclaration.Type
                 ? $"{GetTypeDeclaration()} {identifier} = {{"
@@ -56,6 +55,7 @@ public sealed class TypescriptFormatter : IFormatter
         Sb.Append(declaration);
         Sb.AppendLine();
         InitializeConstructor(identifier);
+        HasOpenType = true;
     }
 
     private void AddExport()
@@ -84,8 +84,9 @@ public sealed class TypescriptFormatter : IFormatter
     private void EndTypeDeclaration()
     {
         AddConstructor();
-        Sb.Append("}");
-        Result.Append(Sb);
+        Sb.AppendLine("}");
+        Sb.AppendLine();
+        HasOpenType = false;
     }
 
     private static string FormatNamingConvention(string identifier)
@@ -146,12 +147,12 @@ public sealed class TypescriptFormatter : IFormatter
 
     private void AddConstructor()
     {
-        if (FormatConfiguration.GenerateConstructor && FormatConfiguration.TypeDeclaration == TypeDeclaration.Class)
-        {
-            Sb.Append(ConstructorSb);
-            Sb.Append(GetIdent());
-            Sb.AppendLine("}");
-        }
+        if (!FormatConfiguration.GenerateConstructor ||
+            FormatConfiguration.TypeDeclaration != TypeDeclaration.Class) return;
+
+        Sb.Append(ConstructorSb);
+        Sb.AppendLine(GetIdent() + "}");
+        ConstructorSb.Clear();
     }
 
     private void AddImport(string[] types)
@@ -180,10 +181,16 @@ public sealed class TypescriptFormatter : IFormatter
         Result.Append(ImportsSb);
     }
 
+    private void BuildMain()
+    {
+        EndTypeDeclaration();
+        Result.Append(Sb);
+    }
+
     public string GetResult()
     {
         AddImports();
-        EndTypeDeclaration();
+        BuildMain();
         return Result.ToString();
     }
 
@@ -192,7 +199,7 @@ public sealed class TypescriptFormatter : IFormatter
             string[]? CustomTypes)> tokens)
     {
         Ignored.AddRange(tokens.Where(c => c.IsDeclaration).Select(c => c.Identifier!));
-        
+
         foreach (var token in tokens)
         {
             if (token.IsComment)
