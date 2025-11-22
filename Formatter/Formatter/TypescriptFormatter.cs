@@ -11,7 +11,7 @@ public sealed class TypescriptFormatter : IFormatter
     private StringBuilder ConstructorSb { get; } = new();
     private StringBuilder ImportsSb { get; } = new();
     private StringBuilder Result { get; } = new();
-    private List<string>? CustomTypes;
+    private List<string>? CustomTypes = new();
     private List<string> Ignored { get; } = new();
     private bool HasOpenType { get; set; }
 
@@ -160,9 +160,9 @@ public sealed class TypescriptFormatter : IFormatter
         if (!FormatConfiguration.IncludeImports)
             return;
 
+        types = types.Where(c => !Ignored.Contains(c)).ToArray();
         CustomTypes ??= new();
-
-
+        
         foreach (var type in types.Where(c => !CustomTypes.Contains(c)))
         {
             var str = $@"import type {type} from ""./{type}"";";
@@ -210,12 +210,15 @@ public sealed class TypescriptFormatter : IFormatter
 
             if (token.IsDeclaration)
             {
+                Ignored.Add(token.Identifier!);
                 FormatTypeDeclaration(token.Identifier!);
                 continue;
             }
 
             if (token.IsCustomType)
+            {
                 AddImport(token.CustomTypes ?? []);
+            }
 
             FormatLine(token.Identifier!, token.Type!);
         }
