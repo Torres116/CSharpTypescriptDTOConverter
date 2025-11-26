@@ -2,7 +2,7 @@
 @using Formatter.Configuration.utils
 @using Web.Components.buttons
 
-<section class="flex flex-row lg:flex-col w-full justify-center lg:justify-start md:max-w-[260px] xl:max-w-[300px] 
+<section class="flex flex-row md:flex-col flex-wrap w-full justify-center lg:justify-start xl:max-w-[300px] 
 gap-2 lg:gap-4 relative">
 
     <div class="p-4 w-full flex flex-col gap-4 border border-white/10 rounded-lg bg-[#222222]">
@@ -133,7 +133,7 @@ gap-2 lg:gap-4 relative">
         FormatConfiguration.IncludeOptionals = value;
         Update();
     }
-    
+
     void OnIncludeImportsChanged(bool value)
     {
         FormatConfiguration.IncludeImports = value;

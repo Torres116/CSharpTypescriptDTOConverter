@@ -174,7 +174,7 @@ public sealed class TypescriptFormatter : IFormatter
 
     private void AddImports()
     {
-        if (!FormatConfiguration.IncludeImports)
+        if (!FormatConfiguration.IncludeImports || ImportsSb.Length == 0)
             return;
 
         ImportsSb.AppendLine();
