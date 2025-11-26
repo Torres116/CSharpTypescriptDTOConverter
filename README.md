@@ -1,0 +1,29 @@
+# CSharp2Typescript
+
+## 📋 Project Overview
+
+**CSharp2Typescript** is a tool / library (or CLI) that helps convert C# classes, DTOs or types into TypeScript definitions (interfaces,types,classes).
+
+---
+
+## 🚀 Key Features
+
+- Transforms C# POCOs / data models into TypeScript interfaces or classes  
+- Keeps property names and structure  
+- Useful for generating TypeScript types for API models  
+
+---
+
+## 💻 Why Use This
+
+This tool helps being productive by generating TypeScript types directly from your C# code.
+
+---
+
+## ⚙️ Installation & Setup
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/Torres116/CSharp2Typescript.git
+   cd CSharp2Typescript
