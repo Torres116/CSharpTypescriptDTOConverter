@@ -5,5 +5,5 @@ namespace Parser.Interfaces;
 
 internal interface IParser
 {
-    ConversionResult Parse(List<IToken> rawTokens);
+    Task<ConversionResult> Parse(List<IToken> rawTokens);
 }

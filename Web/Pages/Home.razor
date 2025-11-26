@@ -59,7 +59,7 @@
         ParseText();
     }
 
-    private void ParseText()
+    private async Task ParseText()
     {
         var temp = input;
 
@@ -68,12 +68,11 @@
             var errors = SyntaxHelper.GetSyntaxErrors(input);
             if (errors.Count > 0)
             {
-                var tempb = errors.Aggregate("", (current, error) => current + error + "\n");
-                output = tempb;
+                output = errors.Aggregate("", (current, error) => current + error + "\n");
                 return;
             }
 
-            output = _parseServiceService.ParseText(input, new Config());
+            output = await _parseServiceService.ParseText(input, new Config());
             StateHasChanged();
         }
         catch (Exception e)

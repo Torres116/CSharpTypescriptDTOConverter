@@ -10,15 +10,14 @@ internal sealed class TypescriptParser : IParser
     private readonly TypescriptTokenGenerator _generator = new();
     private readonly ConversionResult _conversionResult = new();
 
-    public ConversionResult Parse(List<IToken> rawTokens)
+    public async Task<ConversionResult> Parse(List<IToken> rawTokens)
     {
-        _conversionResult.Output = Build(rawTokens);
+        _conversionResult.Output = await Build(rawTokens);
         return _conversionResult;
     }
 
-    string Build(List<IToken> tokens)
+    Task<string> Build(List<IToken> tokens)
     {
-        
         foreach (var token in tokens)
         {
             var newToken = _generator.ConvertToken(token);
@@ -34,6 +33,6 @@ internal sealed class TypescriptParser : IParser
                 token.IsCustomType, token.CustomTypes))
             .ToList());
 
-        return ft.GetResult();
+        return Task.FromResult(ft.GetResult());
     }
 }
