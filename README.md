@@ -2,7 +2,7 @@
 
 ## 📋 Project Overview
 
-**CSharp2Typescript** is a tool that helps convert C# classes, DTOs or types into TypeScript definitions.
+**CSharp2Typescript** is a tool that helps convert C# DTOs into TypeScript definitions.
 
 ---
 
