@@ -6,6 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>Web</RootNamespace>
         <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
@@ -731,6 +732,12 @@
       <_ContentIncludedByDefault Remove="wwwroot\_framework\zh-Hant\Microsoft.CodeAnalysis.resources.wasm" />
       <_ContentIncludedByDefault Remove="wwwroot\_framework\zh-Hant\Microsoft.CodeAnalysis.resources.wasm.br" />
       <_ContentIncludedByDefault Remove="wwwroot\_framework\zh-Hant\Microsoft.CodeAnalysis.resources.wasm.gz" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 
 </Project>
