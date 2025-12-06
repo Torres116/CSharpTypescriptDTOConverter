@@ -20,10 +20,9 @@ internal sealed partial class DictionaryConversionHandler(ITokenGenerator genera
 
         string? type1;
         string? type2;
-
         var isMap = false;
-
-        var dictionaryCount = DictionaryRegex().Matches(token.Type).Count;
+        
+        var dictionaryCount = token.Type.GetDictionaryCount();
         if (dictionaryCount > 1)
         {
             var depth = 0;
@@ -91,7 +90,4 @@ internal sealed partial class DictionaryConversionHandler(ITokenGenerator genera
         var type = isMap ? "Map" : "Record";
         token.Type = $"{type}<{token1.Type},{token2.Type}>";
     }
-
-    [GeneratedRegex("Dictionary")]
-    private static partial Regex DictionaryRegex();
 }

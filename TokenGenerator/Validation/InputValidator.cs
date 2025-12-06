@@ -9,25 +9,26 @@ public static partial class InputValidator
 {
     public static bool ValidateListFormat(this string text)
     {
-        const string pattern = @"\bList\s*<[^<>]+>";
         return ListRegex().IsMatch(text);
     }
 
     public static bool ValidateArrayFormat(this string text)
     {
-        const string pattern = @"\b\w+\s*\[\s*(?:,\s*)*\]";
         return ArrayRegex().IsMatch(text);
     }
 
     public static bool ValidateDictionaryFormat(this string? text)
     {
-        const string pattern = @"\bDictionary\s*<\s*[^<>]*\s*>";
         return DictionaryRegex().IsMatch(text ?? string.Empty);
+    }
+
+    public static int GetDictionaryCount(this string? text)
+    {
+        return DictionaryRegex().Matches(text ?? string.Empty).Count;
     }
 
     public static bool ValidateNullableFormat(this string text)
     {
-        const string pattern = @"^[A-Za-z]+\s*(?:<[^<>]+>)?\s*(?:\[\s*(?:,\s*)*\])?\?$";
         return NullableRegex().IsMatch(text);
     }
 
