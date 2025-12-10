@@ -46,6 +46,6 @@ public static partial class TokenValidator
     [GeneratedRegex(@"^Dictionary<.*Dictionary<.*>.*>$", RegexOptions.Compiled)]
     private static partial Regex NestedDictionaryRegex();
 
-    [GeneratedRegex(@"^[A-Za-z]+\s*(?:<[^<>]+>)?\s*(?:\[\s*(?:,\s*)*\])?\?$", RegexOptions.Compiled)]
+    [GeneratedRegex(@".*\?$", RegexOptions.Compiled)]
     private static partial Regex NullableRegex();
 }
