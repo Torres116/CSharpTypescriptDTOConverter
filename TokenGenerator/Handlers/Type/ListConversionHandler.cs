@@ -17,8 +17,13 @@ internal sealed class ListConversionHandler(ITokenGenerator generator) : ITokenH
         if (!token.IsArray || token.Skip.Contains(SkipOptions.List))
             return;
 
-        token.Type = token.Type.RemoveListAndArray();
-        token.Type = generator.ConvertType(new TypescriptToken { Type = token.Type }).Type;
+        var parsedToken = generator.ConvertType(new TypescriptToken { Type = token.Type.RemoveListAndArray() });
+        token.Type = parsedToken.Type;
+
+        if (parsedToken.CustomTypes?.Length > 0)
+            token.CustomTypes = token.CustomTypes?.Length > 0
+                ? parsedToken.CustomTypes.Concat(token.CustomTypes).ToArray()
+                : parsedToken.CustomTypes;
 
         token.Skip.Add(SkipOptions.CustomType);
     }

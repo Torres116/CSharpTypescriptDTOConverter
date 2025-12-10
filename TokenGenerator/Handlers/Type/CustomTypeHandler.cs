@@ -15,9 +15,9 @@ internal sealed partial class CustomTypeHandler : ITokenHandler
         if (token.Type.ValidateDictionaryFormat())
             return;
 
-        var typeName = GetBaseTypeName(token.Type.RemoveListAndArray());
-        var isCustomTypeFormat = !PrimitiveTypeMapper.Types.ContainsKey(typeName.ToLowerInvariant());
-        token.IsCustomType = isCustomTypeFormat;
+        var typeName = GetBaseTypeName(token.Type);
+        var isCustomType = !PrimitiveTypeMapper.Types.ContainsKey(typeName.ToLowerInvariant());
+        token.IsCustomType = isCustomType;
     }
 
     public void Convert(IParsedToken token)
@@ -34,7 +34,7 @@ internal sealed partial class CustomTypeHandler : ITokenHandler
         if (string.IsNullOrEmpty(rawType))
             return string.Empty;
 
-        var match = TypeRegex().Match(rawType);
+        var match = TypeRegex().Match(rawType.RemoveListAndArray());
         if (match.Success)
             return match.Value.Substring(1, match.Value.Length - 2).Trim();
 

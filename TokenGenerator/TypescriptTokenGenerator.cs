@@ -39,23 +39,22 @@ public sealed class TypescriptTokenGenerator : ITokenGenerator
 
     public IParsedToken ConvertToken(IToken token)
     {
-        if (string.IsNullOrWhiteSpace(token.Identifier) || string.IsNullOrWhiteSpace(token.Type))
-            return new TypescriptToken();
+        switch (token.IsComment)
+        {
+            case true when FormatConfiguration.IncludeComments:
+                return new TypescriptToken { IsComment = token.IsComment, Comment = token.Comment };
+            case true:
+                return new TypescriptToken { Identifier = string.Empty, Type = string.Empty };
+        }
         
         var result = new TypescriptToken
         {
-            Identifier = token.Identifier,
-            Type = token.Type,
-            IsComment = token.IsComment,
+            Identifier = token.Identifier ?? string.Empty,
+            Type = token.Type ?? string.Empty,
+            IsComment = false,
             Comment = token.Comment,
             IsDeclaration = token.IsDeclaration
         };
-
-        switch (token.IsComment)
-        {
-            case true when FormatConfiguration.IncludeComments: return result;
-            case true: return null;
-        }
 
         ConvertType(result);
         ConvertIdentifier(result);

@@ -21,10 +21,7 @@ internal sealed class TypescriptParser : IParser
         foreach (var token in tokens)
         {
             var newToken = _generator.ConvertToken(token);
-            if (newToken != null)
-                _conversionResult.ParsedTokens.Add(newToken);
-            else
-                _conversionResult.Errors.Add($"Error parsing token at index {tokens.IndexOf(token)}");
+            _conversionResult.ParsedTokens.Add(newToken);
         }
 
         var ft = new TypescriptFormatter();

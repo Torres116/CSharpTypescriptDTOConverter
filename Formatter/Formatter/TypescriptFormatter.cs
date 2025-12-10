@@ -195,16 +195,16 @@ public sealed class TypescriptFormatter : IFormatter
     }
 
     public void Format(
-        List<(string? Identifier, string? Type, bool IsComment, string? Comment, bool IsDeclaration, bool IsCustomType,
+        List<(string Identifier, string Type, bool IsComment, string? Comment, bool IsDeclaration, bool IsCustomType,
             string[]? CustomTypes)> tokens)
     {
         Ignored.AddRange(tokens.Where(c => c.IsDeclaration).Select(c => c.Identifier!));
 
         foreach (var token in tokens)
         {
-            if (token.IsComment)
+            if (token.IsComment && !string.IsNullOrWhiteSpace(token.Comment))
             {
-                FormatComment(token.Comment ?? "");
+                FormatComment(token.Comment);
                 continue;
             }
 
