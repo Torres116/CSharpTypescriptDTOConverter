@@ -21,11 +21,11 @@ public sealed class TypescriptTokenGenerator : ITokenGenerator
     {
         _typeHandlers = new()
         {
+            new NullableConversionHandler(this),
             new DateAsStringConversionHandler(this),
             new ListConversionHandler(this),
             new CustomTypeHandler(),
             new DictionaryConversionHandler(this),
-            new NullableConversionHandler(this),
         };
     }
 
@@ -37,16 +37,18 @@ public sealed class TypescriptTokenGenerator : ITokenGenerator
         };
     }
 
-    public IParsedToken? ConvertToken(IToken token)
+    public IParsedToken ConvertToken(IToken token)
     {
+        if (string.IsNullOrWhiteSpace(token.Identifier) || string.IsNullOrWhiteSpace(token.Type))
+            return new TypescriptToken();
+        
         var result = new TypescriptToken
         {
-            Identifier = token.Identifier ?? "",
-            Type = token.Type ?? "",
+            Identifier = token.Identifier,
+            Type = token.Type,
             IsComment = token.IsComment,
             Comment = token.Comment,
-            IsDeclaration = token.IsDeclaration,
-            IsCustomType = token.IsCustomType
+            IsDeclaration = token.IsDeclaration
         };
 
         switch (token.IsComment)
@@ -57,33 +59,38 @@ public sealed class TypescriptTokenGenerator : ITokenGenerator
 
         ConvertType(result);
         ConvertIdentifier(result);
-        CleanupHandler.Cleanup(result);
         return result;
     }
 
     public IParsedToken ConvertType(IParsedToken token)
     {
+        if (_typeHandlers == null)
+            return token;
+        
         PrimitiveTypeMapper.Convert(token);
 
-        foreach (var handler in _typeHandlers ?? [])
+        foreach (var handler in _typeHandlers)
             handler.Verify(token);
 
-        foreach (var handler in _typeHandlers ?? [])
+        foreach (var handler in _typeHandlers)
             handler.Convert(token);
 
+        ParsedTokenNormalizer.NormalizeType(token);
         return token;
     }
 
     public IParsedToken ConvertIdentifier(IParsedToken token)
     {
-        token.Identifier = token.Identifier.Trim();
-
-        foreach (var handler in _identifierHandlers ?? [])
+        if (_identifierHandlers == null)
+            return token;
+        
+        foreach (var handler in _identifierHandlers)
             handler.Verify(token);
 
-        foreach (var handler in _identifierHandlers ?? [])
+        foreach (var handler in _identifierHandlers)
             handler.Convert(token);
 
+        ParsedTokenNormalizer.NormalizeIdentifier(token);
         return token;
     }
 }

@@ -1,4 +1,5 @@
 using TokenGenerator.interfaces;
+using TokenGenerator.utils;
 using TokenGenerator.Validation;
 
 namespace TokenGenerator.Handlers.Type;
@@ -7,17 +8,18 @@ internal sealed class ListConversionHandler(ITokenGenerator generator) : ITokenH
 {
     public void Verify(IParsedToken token)
     {
-        var result = token.Type.ValidateArrayFormat() || token.Type.ValidateListFormat();
-        token.IsArray = result;
+        var isListFormat = token.Type.ValidateArrayFormat() || token.Type.ValidateListFormat();
+        token.IsArray = isListFormat;
     }
 
     public void Convert(IParsedToken token)
     {
-        if (!token.IsArray)
+        if (!token.IsArray || token.Skip.Contains(SkipOptions.List))
             return;
-        
-        token.Type = token.Type.Replace("List", "").Replace("<", "").Replace(">", "").Replace("[]","").Replace("?","");
+
+        token.Type = token.Type.RemoveListAndArray();
         token.Type = generator.ConvertType(new TypescriptToken { Type = token.Type }).Type;
-        token.Type = $"{token.Type}[]";
+
+        token.Skip.Add(SkipOptions.CustomType);
     }
 }

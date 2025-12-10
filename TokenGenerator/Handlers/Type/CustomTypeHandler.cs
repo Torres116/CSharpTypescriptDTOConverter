@@ -1,27 +1,52 @@
+using System.Text.RegularExpressions;
 using TokenGenerator.interfaces;
 using TokenGenerator.utils;
+using TokenGenerator.Validation;
 
 namespace TokenGenerator.Handlers.Type;
 
-internal sealed class CustomTypeHandler : ITokenHandler
+internal sealed partial class CustomTypeHandler : ITokenHandler
 {
     public void Verify(IParsedToken token)
     {
+        if (token.Skip.Contains(SkipOptions.CustomType))
+            return;
+
+        if (token.Type.ValidateDictionaryFormat())
+            return;
+
+        var typeName = GetBaseTypeName(token.Type.RemoveListAndArray());
+        var isCustomTypeFormat = !PrimitiveTypeMapper.Types.ContainsKey(typeName.ToLowerInvariant());
+        token.IsCustomType = isCustomTypeFormat;
     }
 
     public void Convert(IParsedToken token)
     {
-        if (token.TokenCustomTypeSkip || token.IsDictionary)
+        if (token.Skip.Contains(SkipOptions.CustomType) || !token.IsCustomType)
             return;
 
-        var type = token.Type?.Replace("?", "").Replace("[]", "");
-        type = type?.Split(" ").First();
-
-        var result = PrimitiveTypeMapper.Types.Values.FirstOrDefault(x => x.Contains(type));
-        token.IsCustomType = result == null;
-        token.TokenCustomTypeSkip = true;
-
-        if (token.IsCustomType)
-            token.CustomTypes = [type.RemoveGenerics()];
+        var typeName = GetBaseTypeName(token.Type);
+        token.CustomTypes = [typeName];
     }
+
+    private static string GetBaseTypeName(string? rawType)
+    {
+        if (string.IsNullOrEmpty(rawType))
+            return string.Empty;
+
+        var match = TypeRegex().Match(rawType);
+        if (match.Success)
+            return match.Value.Substring(1, match.Value.Length - 2).Trim();
+
+        var type = rawType;
+        var index = type.IndexOf(' ');
+
+        if (index > -1)
+            type = type.Substring(index);
+
+        return type;
+    }
+
+    [GeneratedRegex(@"<.*>")]
+    private static partial Regex TypeRegex();
 }

@@ -1,33 +1,34 @@
-using System.Text.RegularExpressions;
 using TokenGenerator.interfaces;
 using TokenGenerator.utils;
 using TokenGenerator.Validation;
 
 namespace TokenGenerator.Handlers.Type;
 
-internal sealed partial class DictionaryConversionHandler(ITokenGenerator generator) : ITokenHandler
+internal sealed class DictionaryConversionHandler(ITokenGenerator generator) : ITokenHandler
 {
     public void Verify(IParsedToken token)
     {
-        var result = token.Type.ValidateDictionaryFormat() || token.IsDictionary;
-        token.IsDictionary = result;
+        var isDictionaryFormat = token.Type.ValidateDictionaryFormat();
+        token.IsDictionary = isDictionaryFormat;
+        if (isDictionaryFormat)
+            token.Skip.Add(SkipOptions.CustomType);
     }
 
     public void Convert(IParsedToken token)
     {
-        if (!token.IsDictionary || token.Type == null)
+        if (!token.IsDictionary || token.Skip.Contains(SkipOptions.Dictionary))
             return;
 
         string? type1;
         string? type2;
         var isMap = false;
-        
-        var dictionaryCount = token.Type.GetDictionaryCount();
-        if (dictionaryCount > 1)
+
+        var isNestedDictionary = token.Type.IsNestedDictionary();
+        if (isNestedDictionary)
         {
             var depth = 0;
             var pos = 0;
-            var tempType = token.Type.Substring(token.Type.IndexOf('<') + 1);
+            var tempType = token.Type.RemoveDictionary();
             for (var index = 0; index < tempType.Length - 1; index++)
             {
                 var c = tempType[index];
@@ -47,7 +48,7 @@ internal sealed partial class DictionaryConversionHandler(ITokenGenerator genera
 
                 if (c == '<')
                     depth++;
-                
+
                 else if (c == '>')
                     depth--;
             }
@@ -62,16 +63,12 @@ internal sealed partial class DictionaryConversionHandler(ITokenGenerator genera
             type2 = types[1]?.Trim();
         }
 
-        // Check if the first type is a nested dictionary since C# allows reference types as keys.
-        var hasNestedDictionary = type1.ValidateDictionaryFormat() || isMap;
-        type1 = hasNestedDictionary ? type1 : type1.RemoveDictionary();
+        // Check if the first type is a dictionary since C# allows reference types as keys.
         var token1 = generator.ConvertType(new TypescriptToken
-            { Type = type1, Identifier = "", Skip = true, IsDictionary = hasNestedDictionary });
+            { Type = type1, Identifier = "", Skip = { SkipOptions.Nullable } });
 
-        hasNestedDictionary = type2.ValidateDictionaryFormat();
-        type2 = hasNestedDictionary ? type2 : type2.RemoveDictionary();
         var token2 = generator.ConvertType(new TypescriptToken
-            { Type = type2, Identifier = "", Skip = true, IsDictionary = hasNestedDictionary });
+            { Type = type2, Identifier = "", Skip = { SkipOptions.Nullable } });
 
         if (token1.CustomTypes != null || token2.CustomTypes != null)
         {

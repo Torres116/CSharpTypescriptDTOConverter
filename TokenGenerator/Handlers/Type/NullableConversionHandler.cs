@@ -1,4 +1,3 @@
-using Formatter.Configuration;
 using TokenGenerator.interfaces;
 using TokenGenerator.Validation;
 
@@ -8,19 +7,12 @@ internal sealed class NullableConversionHandler(ITokenGenerator generator) : ITo
 {
     public void Verify(IParsedToken token)
     {
-        if (token.Skip)
-            return;
-        
-        var result = token.Type.ValidateNullableFormat();
-        token.IsNull = result;
+        var isNullableFormat = token.Type.ValidateNullableFormat();
+        token.IsNull = isNullableFormat;
+        token.Type = token.Type.Replace("?", "");
     }
 
     public void Convert(IParsedToken token)
     {
-        if (!token.IsNull || !FormatConfiguration.IncludeNullables)
-            return;
-        
-        token.Type = token.Type?.Replace("?", "");
-        token.Type = $"{token.Type} | null";
     }
 }

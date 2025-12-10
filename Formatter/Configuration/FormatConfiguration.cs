@@ -10,7 +10,6 @@ public static class FormatConfiguration
     public static TypeDeclaration TypeDeclaration { get; set; } = TypeDeclaration.Interface;
     public static NamingConvention NamingConvention { get; set; } = NamingConvention.camelCase;
     public static bool GenerateConstructor { get; set; } 
-    public static bool AddTypeAnnotations { get; set; } = true;
     public static bool DatesAsStrings { get; set; } = false;
     public static bool IncludeComments { get; set; } = false;
     public static bool IncludeNullables { get; set; } = false;
@@ -20,7 +19,6 @@ public static class FormatConfiguration
     public static void TurnEverythingOff()
     {
         GenerateConstructor = false;
-        AddTypeAnnotations = false;
         DatesAsStrings = false;
         IncludeComments = false;
         IncludeNullables = false;

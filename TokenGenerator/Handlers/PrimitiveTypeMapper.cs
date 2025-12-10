@@ -1,3 +1,4 @@
+using TokenGenerator.Handlers.Type;
 using TokenGenerator.interfaces;
 
 namespace TokenGenerator.Handlers;
@@ -23,14 +24,10 @@ internal sealed class PrimitiveTypeMapper
         { "ulong", "number" },
         { "ushort", "number" },
         { "object", "any" },
-        // { "dictionary", "record" }
     };
 
     public static void Convert(IParsedToken token)
     {
-        if (token.Type == null)
-            return;
-
         var type = token.Type?.Replace("?", "").Replace("[]", "").ToLower();
         var result = Types!.GetValueOrDefault(type, null);
 
@@ -43,7 +40,7 @@ internal sealed class PrimitiveTypeMapper
                 result += '?';
 
             token.Type = result;
+            token.Skip.Add(SkipOptions.CustomType);
         }
-
     }
 }

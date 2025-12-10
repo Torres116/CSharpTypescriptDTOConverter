@@ -1,3 +1,4 @@
+using TokenGenerator.Handlers.Type;
 using TokenGenerator.interfaces;
 
 namespace TokenGenerator;
@@ -9,7 +10,7 @@ public class TypescriptToken : Token, IParsedToken
     public bool IsDate { get; set; }
     public bool IsArray { get; set; }
     public bool IsDictionary { get; set; }
-    public bool Skip { get; set; }
-    public bool TokenCustomTypeSkip { get; set; }
+    public bool IsCustomType { get; set; }
+    public HashSet<SkipOptions> Skip { get; set; } = new();
     public string[]? CustomTypes { get; set; }
 }

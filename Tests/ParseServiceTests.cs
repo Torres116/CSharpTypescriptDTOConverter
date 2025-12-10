@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Formatter.Configuration;
 using Parser;
 
@@ -126,7 +125,7 @@ public sealed class ParseServiceTests
                 public List<AuditLogEntry>? AuditLogs { get; set; }
 
                 // Random metadata
-                public Dictionary<string, string>? Metadata { get; set; }
+                public Dictionary<List<string>, string>? Metadata { get; set; }
             }
 
             public record UserModel(
@@ -208,7 +207,7 @@ public sealed class ParseServiceTests
               createdBy:  string;
               modifiedBy:  string;
               auditLogs:  AuditLogEntry[];
-              metadata:  Record<string,string>;
+              metadata:  Record<string[],string>;
             }
 
             export interface UserModel {
@@ -532,5 +531,52 @@ public sealed class ParseServiceTests
             }
             """
         ];
+
+        yield return
+        [
+            """
+            public class Arrays {
+              public List<DateTime> Dates { get; set; } = new();
+              public List<int> Ints { get; set; } = new();
+              public List<string> Strings { get; set; } = new();
+              public List<Dictionary<string, string>> Dictionaries { get; set; } = new();
+            }
+            """,
+            """
+            export interface Arrays {
+              dates:  Date[];
+              ints:  number[];
+              strings:  string[];
+              dictionaries:  Record<string,string>[];
+            }
+            """
+        ];
+
+        // yield return
+        // [
+        //     """
+        //     public class TestScratch
+        //     {
+        //         public List<List<Dictionary<Dictionary<string, Dictionary<string, string>>, string>>>? Metadata { get; set; }
+        //         public List<Dictionary<Dictionary<string, Dictionary<string, string>>, string>>? MetadataV2 { get; set; }
+        //         public List<List<List<List<int>>>> test1;
+        //         public List<Dictionary<List<List<int>>, List<List<int>>>> test2;
+        //         public List<Dictionary<List<List<List<Dictionary<List<List<int>>, List<List<int>>>>>>, List<List<int>>>> test3;
+        //         public Dictionary<List<Dictionary<List<List<List<Dictionary<List<List<int>>, List<List<int>>>>>>, List<List<int[]>>>>,Test> test4;
+        //         public Dictionary<int[], int[]> testa;
+        //     }
+        //     """,
+        //     """
+        //     export interface TestScratch {
+        //       metadata:  Map<Record<string,Record<string,string>>,string>[][];
+        //       metadataV2:  Map<Record<string,Record<string,string>>,string>[];
+        //       test1:  number[][][][];
+        //       test2:  Map<number[][],number[][]>[];
+        //       test3:  Map<Record<number[][],number[][]>[][][],number[][]>[];
+        //       test4:  Map<Map<Record<number[][],number[][]>[][][],number[][][]>[],Test>;
+        //       testa:  Map<number[],number[]>;
+        //     }
+        //     """
+        // ];
     }
 }
