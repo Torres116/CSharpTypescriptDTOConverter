@@ -83,8 +83,13 @@ internal sealed class DictionaryConversionHandler(ITokenGenerator generator) : I
                 token.CustomTypes = token2.CustomTypes;
         }
 
-        // if the first type is a nested dictionary
+        if(!isMap)
+            isMap = token1.IsDictionary || token1.IsArray;
+        
+        // if the first type is a nested dictionary or Array
         var type = isMap ? "Map" : "Record";
         token.Type = $"{type}<{token1.Type},{token2.Type}>";
     }
+    
+    
 }

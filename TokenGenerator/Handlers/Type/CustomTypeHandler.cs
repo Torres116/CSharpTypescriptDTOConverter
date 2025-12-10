@@ -34,7 +34,9 @@ internal sealed partial class CustomTypeHandler : ITokenHandler
         if (string.IsNullOrEmpty(rawType))
             return string.Empty;
 
-        var match = TypeRegex().Match(rawType.RemoveListAndArray());
+        rawType = rawType.RemoveListAndArray();
+        var match = TypeRegex().Match(rawType);
+        
         if (match.Success)
             return match.Value.Substring(1, match.Value.Length - 2).Trim();
 
