@@ -37,7 +37,7 @@ func main(){
 
     // Serve the app
     fmt.Println("Serving Blazor app...")
-    if err := runCommand("dotnet", "serve","-d", wwwrootDir,"--path-base",basePath); err != nil {
+    if err := runCommand("dotnet", "serve","-d", wwwrootDir,"--path-base",basePath,"-p","59973"); err != nil {
         fmt.Println("Serve failed:", err)
         return
     }

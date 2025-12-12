@@ -9,9 +9,9 @@ public static class FormatConfiguration
     public static TypeDeclaration TypeDeclaration { get; set; } = TypeDeclaration.Interface;
     public static NamingConvention NamingConvention { get; set; } = NamingConvention.camelCase;
     public static bool IncludeConstructor { get; set; }
-    public static bool DatesAsStrings { get; set; } = false;
-    public static bool IncludeComments { get; set; } = false;
-    public static bool IncludeNullables { get; set; } = false;
+    public static bool DatesAsStrings { get; set; }
+    public static bool IncludeComments { get; set; }
+    public static bool IncludeNullables { get; set; }
     public static bool IncludeOptionals { get; set; } = true;
     public static bool IncludeImports { get; set; } = true;
     public static bool HasConstructor => IncludeConstructor && TypeDeclaration == TypeDeclaration.Class;

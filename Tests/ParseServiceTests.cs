@@ -207,7 +207,7 @@ public sealed class ParseServiceTests
               createdBy:  string;
               modifiedBy:  string;
               auditLogs:  AuditLogEntry[];
-              metadata:  Record<string[],string>;
+              metadata:  Map<string[],string>;
             }
 
             export interface UserModel {
@@ -552,31 +552,31 @@ public sealed class ParseServiceTests
             """
         ];
 
-        // yield return
-        // [
-        //     """
-        //     public class TestScratch
-        //     {
-        //         public List<List<Dictionary<Dictionary<string, Dictionary<string, string>>, string>>>? Metadata { get; set; }
-        //         public List<Dictionary<Dictionary<string, Dictionary<string, string>>, string>>? MetadataV2 { get; set; }
-        //         public List<List<List<List<int>>>> test1;
-        //         public List<Dictionary<List<List<int>>, List<List<int>>>> test2;
-        //         public List<Dictionary<List<List<List<Dictionary<List<List<int>>, List<List<int>>>>>>, List<List<int>>>> test3;
-        //         public Dictionary<List<Dictionary<List<List<List<Dictionary<List<List<int>>, List<List<int>>>>>>, List<List<int[]>>>>,Test> test4;
-        //         public Dictionary<int[], int[]> testa;
-        //     }
-        //     """,
-        //     """
-        //     export interface TestScratch {
-        //       metadata:  Map<Record<string,Record<string,string>>,string>[][];
-        //       metadataV2:  Map<Record<string,Record<string,string>>,string>[];
-        //       test1:  number[][][][];
-        //       test2:  Map<number[][],number[][]>[];
-        //       test3:  Map<Record<number[][],number[][]>[][][],number[][]>[];
-        //       test4:  Map<Map<Record<number[][],number[][]>[][][],number[][][]>[],Test>;
-        //       testa:  Map<number[],number[]>;
-        //     }
-        //     """
-        // ];
+        yield return
+        [
+            """
+            public class TestScratch2
+            {
+                public List<List<Dictionary<Dictionary<string, Dictionary<string, string>>, string>>>? Metadata { get; set; }
+                public List<Dictionary<Dictionary<string, Dictionary<string, string>>, string>>? MetadataV2 { get; set; }
+                public List<List<List<List<int>>>> test1;
+                public List<Dictionary<List<List<int>>, List<List<int>>>> test2;
+                public List<Dictionary<List<List<List<Dictionary<List<List<int>>, List<List<int>>>>>>, List<List<int>>>> test3;
+                public Dictionary<List<Dictionary<List<List<List<Dictionary<List<List<int>>, List<List<int>>>>>>, List<List<int[]>>>>,Test> test4;
+                public Dictionary<int[], int[]> testz;
+            }
+            """,
+            """
+            export interface TestScratch2 {
+              metadata:  Map<Record<string,Record<string,string>>,string>[][];
+              metadataV2:  Map<Record<string,Record<string,string>>,string>[];
+              test1:  number[][][][];
+              test2:  Map<number[][],number[][]>[];
+              test3:  Map<Map<number[][],number[][]>[][][],number[][]>[];
+              test4:  Map<Map<Map<number[][],number[][]>[][][],number[][][]>[],Test>;
+              testz:  Map<number[],number[]>;
+            }
+            """
+        ];
     }
 }
