@@ -6,24 +6,24 @@ namespace Parser;
 
 internal sealed partial class Lexer
 {
-    readonly string[] ignoredKeywords =
-    [
+    private static readonly HashSet<string> IgnoredKeywords = new(StringComparer.OrdinalIgnoreCase)
+    {
         "public",
         "private",
         "protected",
         "internal",
         "async",
         "enum"
-    ];
+    };
 
-    readonly string[] _declarationKeywords =
-    [
+    private static readonly HashSet<string> DeclarationKeywords = new(StringComparer.OrdinalIgnoreCase)
+    {
         "class",
         "record"
-    ];
+    };
 
-    readonly string[] _tokenType =
-    [
+    private static readonly HashSet<string> Type = new(StringComparer.OrdinalIgnoreCase)
+    {
         "class",
         "interface",
         "record",
@@ -35,97 +35,22 @@ internal sealed partial class Lexer
         "char",
         "datetime",
         "timespan"
-    ];
-
-    enum TypeDeclaration
-    {
-        CLASS,
-        RECORD,
-        NONE
-    }
+    };
 
     public List<IToken> Tokenize(string input)
     {
         if (string.IsNullOrWhiteSpace(input))
             return [];
 
-        input = RemoveSpaceAfter().Replace(input, "<"); // remove spaces after '<'
-        input = RemoveSpacesBefore().Replace(input, ">"); // remove spaces before '>'
-
+        var formattedInput = GetLines(input);
         var result = new List<IToken>();
-        var separators = new[] { "\n" };
-        var formattedInput = input
-            .Split(separators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(c => c.Replace(";", "").Replace("\n", "").Replace("\t", ""))
-            .ToArray();
-
-        var typeDeclaration = TypeDeclaration.NONE;
 
         try
         {
             foreach (var line in formattedInput)
             {
-                var token = new Token();
-                var currentLine = GetCurrentLineArray(line, typeDeclaration);
-
-                for (var index = 0; index < currentLine.Length; index++)
-                {
-                    if (currentLine.Length - 1 <= index)
-                        break;
-
-                    var current = currentLine[index];
-                    var next = currentLine[index + 1];
-
-                    if (!_declarationKeywords.Contains(current.ToLower()))
-                        continue;
-
-                    token = new Token
-                    {
-                        Type = current,
-                        Identifier = next,
-                        IsDeclaration = true
-                    };
-
-                    typeDeclaration = current switch
-                    {
-                        "class" => TypeDeclaration.CLASS,
-                        "record" => TypeDeclaration.RECORD,
-                        _ => typeDeclaration
-                    };
-
-                    result.Add(token);
-                    break;
-                }
-
-                if (token.IsDeclaration)
-                    continue;
-
-                for (var j = 0; j < currentLine.Length; j++)
-                {
-                    var current = currentLine[j];
-
-                    if (string.IsNullOrWhiteSpace(current))
-                        break;
-
-                    if (current.StartsWith("//"))
-                    {
-                        var comment = string.Join(" ", currentLine).Replace("//", "");
-                        token.IsComment = true;
-                        token.Comment = comment;
-                        break;
-                    }
-
-                    if (_tokenType.Contains(current.ToLower()) || token.Type == null && currentLine.Length - 1 > j)
-                    {
-                        token.Type = current;
-                        continue;
-                    }
-
-                    token.Identifier = current.Replace(",", "");
-                }
-
-                if (token is not { Type: null, Identifier: null } || token.IsComment)
-                    result.Add(token);
+                var token = CreateToken(line);
+                result.Add(token);
             }
         }
         catch (Exception e)
@@ -137,13 +62,74 @@ internal sealed partial class Lexer
         return result;
     }
 
-    private string[] GetCurrentLineArray(string input, TypeDeclaration type)
+    // Format input 
+    private IEnumerable<string> GetLines(string input)
+    {
+        input = RemoveSpaceAfter().Replace(input, "<"); // remove spaces after '<'
+        input = RemoveSpacesBefore().Replace(input, ">"); // remove spaces before '>'
+
+        var separators = new[] { "\n" };
+        var formattedInput = input
+            .Split(separators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(c => c.Replace(";", "").Replace("\n", "").Replace("\t", ""))
+            .ToArray();
+
+        return formattedInput;
+    }
+
+    // Remove spaces and split line
+    private string[] SplitLine(string input)
     {
         input = RemoveSpacesAroundComma().Replace(input, ",");
         return input.Split([" "], StringSplitOptions.RemoveEmptyEntries)
-            .Where(c => !ignoredKeywords.Contains(c))
+            .Where(c => !IgnoredKeywords.Contains(c))
             .Select(c => c.Replace("{", "").Replace("}", "").Replace("(", "").Replace(")", "").Replace(":", ""))
             .ToArray();
+    }
+
+    private IToken CreateToken(string line)
+    {
+        var token = new Token();
+        var currentLine = SplitLine(line);
+
+        for (var j = 0; j < currentLine.Length; j++)
+        {
+            var current = currentLine[j];
+
+            if (DeclarationKeywords.Contains(current) && j < currentLine.Length - 1)
+            {
+                var identifier = currentLine[++j];
+                token = new Token
+                {
+                    Type = string.Empty,
+                    Identifier = identifier,
+                    IsDeclaration = true
+                };
+
+                return token;
+            }
+
+            if (string.IsNullOrWhiteSpace(current))
+                break;
+
+            if (current.StartsWith("//"))
+            {
+                var comment = string.Join(" ", currentLine).Replace("//", "");
+                token.IsComment = true;
+                token.Comment = comment;
+                break;
+            }
+
+            if (Type.Contains(current.ToLower()) || (token.Type == null && j < currentLine.Length - 1))
+            {
+                token.Type = current;
+                continue;
+            }
+
+            token.Identifier = current.Replace(",", "");
+        }
+
+        return token;
     }
 
     [GeneratedRegex(@"<\s*")]

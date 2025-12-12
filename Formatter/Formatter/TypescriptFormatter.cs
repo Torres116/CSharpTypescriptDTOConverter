@@ -8,11 +8,9 @@ namespace Formatter.Formatter;
 public sealed class TypescriptFormatter : IFormatter
 {
     private StringBuilder Sb { get; } = new();
-    private StringBuilder ConstructorSb { get; } = new();
-    private StringBuilder ImportsSb { get; } = new();
+    private ImportsManager ImportsManager { get; } = new();
+    private ConstructorManager ConstructorManager { get; } = new();
     private StringBuilder Result { get; } = new();
-    private List<string>? CustomTypes = new();
-    private List<string> Ignored { get; } = new();
     private bool HasOpenType { get; set; }
 
     private void FormatLine(string identifier, string type)
@@ -20,21 +18,22 @@ public sealed class TypescriptFormatter : IFormatter
         if (string.IsNullOrWhiteSpace(identifier) || string.IsNullOrWhiteSpace(type))
             return;
 
-        identifier = FormatNamingConvention(identifier);
-
-        FormatConstructorParameter(identifier);
+        FormatNamingConvention(ref identifier);
         Sb.Append(FormatIdentifier(identifier));
-        Sb.Append(FormatType(type));
-        Sb.AppendLine();
+        Sb.AppendLine(FormatType(type));
+
+        Console.WriteLine(FormatConfiguration.HasConstructor);
+        if (FormatConfiguration.HasConstructor)
+            ConstructorManager.FormatConstructorParameter(identifier);
     }
 
     private string GetTypeDeclaration()
     {
         return FormatConfiguration.TypeDeclaration switch
         {
-            TypeDeclaration.Class => "class",
-            TypeDeclaration.Interface => "interface",
-            TypeDeclaration.Type => "type",
+            TypeDeclaration.Class => "export class",
+            TypeDeclaration.Interface => "export interface",
+            TypeDeclaration.Type => "export type",
             _ => throw new ArgumentOutOfRangeException()
         };
     }
@@ -44,54 +43,29 @@ public sealed class TypescriptFormatter : IFormatter
         if (HasOpenType)
             EndTypeDeclaration();
 
-        Ignored.Add(identifier);
-        AddExport();
+        ImportsManager.IgnoreImport(identifier);
 
-        var declaration =
-            FormatConfiguration.TypeDeclaration == TypeDeclaration.Type
-                ? $"{GetTypeDeclaration()} {identifier} = {{"
-                : $"{GetTypeDeclaration()} {identifier} {{";
+        var declaration = FormatConfiguration.TypeDeclaration == TypeDeclaration.Type
+            ? $"{GetTypeDeclaration()} {identifier} = {{"
+            : $"{GetTypeDeclaration()} {identifier} {{";
 
-        Sb.Append(declaration);
-        Sb.AppendLine();
-        InitializeConstructor(identifier);
+        Sb.AppendLine(declaration);
+        ConstructorManager.InitializeConstructor(identifier);
         HasOpenType = true;
-    }
-
-    private void AddExport()
-    {
-        Sb.Append("export ");
-    }
-
-    private static string GetIdent()
-    {
-        var ident = new string(' ', FormatConfiguration.IdentSize * FormatConfiguration.IdentLevel);
-        return ident;
-    }
-
-    private static string GetWhiteSpace(int count = 1)
-    {
-        var ident = new string(' ', count);
-        return ident;
-    }
-
-    private static string GetTab(int? tabSize = null)
-    {
-        var tab = new string(' ', tabSize ?? FormatConfiguration.TabSize);
-        return tab;
     }
 
     private void EndTypeDeclaration()
     {
-        AddConstructor();
+        if (FormatConfiguration.IncludeConstructor && FormatConfiguration.TypeDeclaration == TypeDeclaration.Class)
+            Sb.Append(ConstructorManager.GetConstructor());
         Sb.AppendLine("}");
         Sb.AppendLine();
         HasOpenType = false;
     }
 
-    private static string FormatNamingConvention(string identifier)
+    private static void FormatNamingConvention(ref string identifier)
     {
-        return FormatConfiguration.NamingConvention switch
+        identifier = FormatConfiguration.NamingConvention switch
         {
             NamingConvention.camelCase => NamingConventionHandler.ToCamelCase(identifier),
             NamingConvention.PascalCase => NamingConventionHandler.ToPascalCase(identifier),
@@ -102,95 +76,19 @@ public sealed class TypescriptFormatter : IFormatter
 
     private string FormatIdentifier(string identifier)
     {
-        return $"{GetIdent()}{identifier}:";
+        return $"{FormatConfiguration.GetIdent()}{identifier}:";
     }
 
     private string FormatType(string type)
     {
-        return $"{GetTab()}{type};";
-    }
-
-    private void FormatComment(string comment)
-    {
-        Sb.Append(GetIdent());
-        Sb.Append("//");
-        Sb.Append(comment);
-        Sb.AppendLine();
-    }
-
-    private void InitializeConstructor(string identifier)
-    {
-        if (!FormatConfiguration.GenerateConstructor || FormatConfiguration.TypeDeclaration != TypeDeclaration.Class)
-            return;
-
-        var declaration = $"constructor(init: {identifier}) {{ ";
-
-        ConstructorSb.AppendLine();
-        ConstructorSb.Append(GetIdent());
-        ConstructorSb.Append(declaration);
-        ConstructorSb.AppendLine();
-    }
-
-    private void FormatConstructorParameter(string identifier)
-    {
-        if (!FormatConfiguration.GenerateConstructor || FormatConfiguration.TypeDeclaration != TypeDeclaration.Class)
-            return;
-
-        identifier = identifier.Replace("?", "");
-
-        var declaration = $"this.{identifier} =  init.{identifier}";
-        ConstructorSb.Append(GetIdent());
-        ConstructorSb.Append(GetWhiteSpace());
-        ConstructorSb.Append(declaration);
-        ConstructorSb.AppendLine(";");
-    }
-
-    private void AddConstructor()
-    {
-        if (!FormatConfiguration.GenerateConstructor ||
-            FormatConfiguration.TypeDeclaration != TypeDeclaration.Class) return;
-
-        Sb.Append(ConstructorSb);
-        Sb.AppendLine(GetIdent() + "}");
-        ConstructorSb.Clear();
-    }
-
-    private void AddImport(string[] types)
-    {
-        if (!FormatConfiguration.IncludeImports)
-            return;
-
-        types = types.Where(c => !Ignored.Contains(c)).ToArray();
-        CustomTypes ??= new();
-        
-        foreach (var type in types.Where(c => !CustomTypes.Contains(c)))
-        {
-            var str = $@"import type {type} from ""./{type}"";";
-
-            CustomTypes.Add(type);
-            ImportsSb.AppendLine(str);
-        }
-    }
-
-    private void AddImports()
-    {
-        if (!FormatConfiguration.IncludeImports || ImportsSb.Length == 0)
-            return;
-
-        ImportsSb.AppendLine();
-        Result.Append(ImportsSb);
-    }
-
-    private void BuildMain()
-    {
-        EndTypeDeclaration();
-        Result.Append(Sb);
+        return $"{FormatConfiguration.GetTab()}{type};";
     }
 
     public string GetResult()
     {
-        AddImports();
-        BuildMain();
+        Result.Append(ImportsManager.GetImports());
+        EndTypeDeclaration();
+        Result.Append(Sb);
         return Result.ToString().Trim();
     }
 
@@ -198,38 +96,32 @@ public sealed class TypescriptFormatter : IFormatter
         List<(string Identifier, string Type, bool IsComment, string? Comment, bool IsDeclaration, bool IsCustomType,
             string[]? CustomTypes)> tokens)
     {
-        Ignored.AddRange(tokens.Where(c => c.IsDeclaration).Select(c => c.Identifier!));
+        ImportsManager.IgnoreImport(tokens.Where(c => c.IsDeclaration).Select(c => c.Identifier).ToArray());
 
         foreach (var token in tokens)
         {
-            if (token.IsComment && !string.IsNullOrWhiteSpace(token.Comment))
+            if (token.IsComment && FormatConfiguration.IncludeComments)
             {
-                FormatComment(token.Comment);
+                CommentHandler.AddComment(token.Comment, Sb);
                 continue;
             }
 
             if (token.IsDeclaration)
             {
-                Ignored.Add(token.Identifier!);
-                FormatTypeDeclaration(token.Identifier!);
+                ImportsManager.IgnoreImport(token.Identifier);
+                FormatTypeDeclaration(token.Identifier);
                 continue;
             }
 
-            if (token.IsCustomType)
-            {
-                AddImport(token.CustomTypes ?? []);
-            }
+            if (token.IsCustomType && FormatConfiguration.IncludeImports)
+                ImportsManager.AddImport(token.CustomTypes ?? []);
 
-            FormatLine(token.Identifier!, token.Type!);
+            FormatLine(token.Identifier, token.Type);
         }
     }
 
     public void Reset()
     {
         Sb.Clear();
-        ImportsSb.Clear();
-        ConstructorSb.Clear();
-        CustomTypes = null;
-        Ignored?.Clear();
     }
 }

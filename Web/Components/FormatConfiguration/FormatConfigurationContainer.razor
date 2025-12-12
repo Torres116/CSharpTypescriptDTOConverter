@@ -24,7 +24,7 @@ gap-2 lg:gap-4 relative">
         <h2 class="text-white">Conversion Options</h2>
 
         <div class="flex gap-2 items-center">
-            <Checkbox OnValueChange="OnGenerateConstructorChanged" InitialState="_generateConstructor"/>
+            <Checkbox OnValueChange="OnGenerateConstructorChanged" InitialState="_includeConstructor"/>
             <h2 class="text-white/60">Generate Constructor</h2>
         </div>
 
@@ -59,7 +59,7 @@ gap-2 lg:gap-4 relative">
 
 @code {
 
-    private readonly bool _generateConstructor = FormatConfiguration.GenerateConstructor;
+    private readonly bool _includeConstructor = FormatConfiguration.IncludeConstructor;
     private readonly bool _datesAsStrings = FormatConfiguration.DatesAsStrings;
     private readonly bool _includeComments = FormatConfiguration.IncludeComments;
     private readonly bool _includeNullables = FormatConfiguration.IncludeNullables;
@@ -106,7 +106,7 @@ gap-2 lg:gap-4 relative">
 
     void OnGenerateConstructorChanged(bool value)
     {
-        FormatConfiguration.GenerateConstructor = value;
+        FormatConfiguration.IncludeConstructor = value;
         Update();
     }
 

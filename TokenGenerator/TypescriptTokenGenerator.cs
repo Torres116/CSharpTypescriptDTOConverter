@@ -39,14 +39,12 @@ public sealed class TypescriptTokenGenerator : ITokenGenerator
 
     public IParsedToken ConvertToken(IToken token)
     {
-        switch (token.IsComment)
-        {
-            case true when FormatConfiguration.IncludeComments:
-                return new TypescriptToken { IsComment = token.IsComment, Comment = token.Comment };
-            case true:
-                return new TypescriptToken { Identifier = string.Empty, Type = string.Empty };
-        }
-        
+        if (token.IsDeclaration)
+            return new TypescriptToken { IsDeclaration = token.IsDeclaration, Identifier = token.Identifier };
+
+        if (token.IsComment) 
+            return new TypescriptToken { IsComment = token.IsComment, Comment = token.Comment };
+
         var result = new TypescriptToken
         {
             Identifier = token.Identifier ?? string.Empty,
@@ -63,9 +61,9 @@ public sealed class TypescriptTokenGenerator : ITokenGenerator
 
     public IParsedToken ConvertType(IParsedToken token)
     {
-        if (_typeHandlers == null)
+        if (_typeHandlers == null || string.IsNullOrEmpty(token.Type))
             return token;
-        
+
         PrimitiveTypeMapper.Convert(token);
 
         foreach (var handler in _typeHandlers)
@@ -80,9 +78,9 @@ public sealed class TypescriptTokenGenerator : ITokenGenerator
 
     public IParsedToken ConvertIdentifier(IParsedToken token)
     {
-        if (_identifierHandlers == null)
+        if (_identifierHandlers == null || string.IsNullOrEmpty(token.Identifier))
             return token;
-        
+
         foreach (var handler in _identifierHandlers)
             handler.Verify(token);
 
