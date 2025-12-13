@@ -31,11 +31,7 @@ public sealed class ParseService
             var rawTokens = lexer.Tokenize(text);
             conversionResult = await parser.Parse(rawTokens,ct);
         }
-        catch (OperationCanceledException)
-        {
-            throw;
-        }
-        catch (Exception e)
+        catch (Exception e) when (e is not OperationCanceledException)
         {
             throw new ParseServiceException("Parsing Error.", e);
         }

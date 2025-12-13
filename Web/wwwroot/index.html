@@ -2,27 +2,26 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>CSharpTypescriptConvert</title>
-    <base href="/CSharpTypescriptDTOConverter/" />
+    <base href="/CSharpTypescriptDTOConverter/"/>
+    <!--    <link rel="stylesheet" href="css/tailwind.css?v"/>-->
     <!--    HighlightJS-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
-
-    <link rel="stylesheet" href="css/Default.css"/>
-    <link rel="stylesheet" href="css/tailwind.css"/>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
     <!-- If you add any scoped CSS files, uncomment the following to load them
     <link href="Blazor.styles.css" rel="stylesheet" /> -->
 </head>
 
 <body class=" bg-[#1a1a1a]">
-    <div id="app">
-    </div>
+<div id="app">
+</div>
 
-    <script src="_framework/blazor.webassembly.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/go.min.js"></script>
- 
+<script src="_framework/blazor.webassembly.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/go.min.js"></script>
+
 </body>
 
 <script>
@@ -32,8 +31,10 @@
         const originalWarn = console.warn;
         const originalLog = console.log;
 
-        console.warn = () => {};
-        console.log = () => {};
+        console.warn = () => {
+        };
+        console.log = () => {
+        };
 
         document.querySelectorAll(selector).forEach(block => {
             block.removeAttribute('data-highlighted');
@@ -43,25 +44,38 @@
         console.warn = originalWarn;
         console.log = originalLog;
     };
+
+    // add Tailwind CSS with random version attached
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const randomVersion = Math.floor(Math.random() * 10000) + 1;
+
+        let linkSiteCSS = document.createElement('link');
+
+        linkSiteCSS.rel = 'stylesheet';
+        linkSiteCSS.href = 'css/tailwind.css?v' + randomVersion;
+
+        document.head.appendChild(linkSiteCSS);
+    });
 </script>
 
 <style>
     pre.hljs, code.hljs {
         padding: 0 !important;
         margin: 0 !important;
-        display: block; /* optional, ensures line breaks */
-        background: transparent !important; /* removes theme background if you have your own */
+        display: block;
+        background: transparent !important;
     }
-    
+
     button {
-        cursor: pointer!important;
+        cursor: pointer !important;
     }
 
     * {
-        scrollbar-width: none;       /* hides scrollbar */
-        -ms-overflow-style: none;    /* IE/Edge legacy */
+        scrollbar-width: none;
+        -ms-overflow-style: none;
     }
-    
+
 </style>
 
 </html>

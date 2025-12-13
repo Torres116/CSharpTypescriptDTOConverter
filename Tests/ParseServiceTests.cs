@@ -13,9 +13,9 @@ public sealed class ParseServiceTests
     {
         FormatConfiguration.TurnEverythingOff();
 
-        var result = await _parseService.ParseText(input, new Config());
+        var result = await _parseService.Parse(input, new Config());
 
-        Assert.Equal(expected, result);
+        Assert.Equal(expected, result.Output);
     }
 
     public static IEnumerable<object[]> GetInterfaceInputsAndOutputs()
