@@ -7,13 +7,13 @@ public sealed class ParseService
 {
     private Config _config;
 
-    public async Task<string> ParseText(string text, Config cfg)
+    public async Task<ConversionResult> Parse(string text, Config cfg,CancellationToken ct = default)
     {
         _config = cfg;
-        return await Parse(text);
+        return await Convert(text,ct);
     }
 
-    private async Task<string> Parse(string text)
+    private async Task<ConversionResult> Convert(string text,CancellationToken ct)
     {
         var syntaxErrors = SyntaxHelper.GetSyntaxErrors(text);
         if (syntaxErrors.Count > 0)
@@ -24,9 +24,22 @@ public sealed class ParseService
 
         var lexer = new Lexer();
         var parser = ParserFactory.GetParser(_config.parser);
+        ConversionResult conversionResult;
+        
+        try
+        {
+            var rawTokens = lexer.Tokenize(text);
+            conversionResult = await parser.Parse(rawTokens,ct);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception e)
+        {
+            throw new ParseServiceException("Parsing Error.", e);
+        }
 
-        var rawTokens = lexer.Tokenize(text);
-        var conversionResult = await parser.Parse(rawTokens);
-        return conversionResult.Output;
+        return conversionResult;
     }
 }

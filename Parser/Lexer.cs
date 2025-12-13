@@ -95,6 +95,8 @@ internal sealed partial class Lexer
         for (var j = 0; j < currentLine.Length; j++)
         {
             var current = currentLine[j];
+            if (string.IsNullOrWhiteSpace(current))
+                break;
 
             if (DeclarationKeywords.Contains(current) && j < currentLine.Length - 1)
             {
@@ -108,9 +110,6 @@ internal sealed partial class Lexer
 
                 return token;
             }
-
-            if (string.IsNullOrWhiteSpace(current))
-                break;
 
             if (current.StartsWith("//"))
             {

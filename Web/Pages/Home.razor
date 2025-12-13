@@ -3,8 +3,9 @@
 @using Parser
 @using Web.Components.Editor
 @using Web.Components.FormatConfiguration
+@using Web.Components.modals
 
-<PageTitle>C#TSConverter</PageTitle>
+<PageTitle>C#TSDTOConvert</PageTitle>
 
 <div class="w-full h-full flex justify-center gap-4">
 
@@ -12,11 +13,11 @@
 
         @* Containers *@
         <div class="flex flex-row flex-wrap gap-4 flex-grow justify-center w-full p-6">
-            
+
             @* User Input Container *@
             <Editor Config="@(new EditorConfig(false, "CSharp", csIcon))" OnChange="@OnInputChange"/>
             @* Parsed  output *@
-            <Editor @key="output" Config="@(new EditorConfig(true, "Typescript", tsIcon))" Text="@output"/>
+            <Editor @key="_output" Config="@(new EditorConfig(true, "Typescript", tsIcon))" Text="@_output"/>
 
             <FormatConfigurationContainer/>
         </div>
@@ -36,14 +37,29 @@
             </button>
         </div>
 
+        <div class="@(_showError
+                        ? "flex opacity-100 translate-x-0"
+                        : "flex opacity-0 translate-x-full"
+                    ) transition-all duration-300 absolute top-10 right-10">
+            <ErrorModal Message="@_errorMessage" Title="@_errorTitle" HasError="@_showError"/>
+        </div>
+
     </section>
 
 </div>
 
 @code {
 
-    string input;
-    string output;
+    string _input = string.Empty;
+    string _output = string.Empty;
+    
+    string? _errorTitle;
+    string? _errorMessage;
+    
+    bool _showError;
+
+    private CancellationTokenSource? _parseCt;
+    private CancellationTokenSource? _errorCt;
 
     const string tsIcon = "svg/TS.svg";
     const string csIcon = "svg/CSharp.svg";
@@ -52,34 +68,60 @@
 
     private Task OnInputChange(string text)
     {
-        input = text;
+        _input = text;
         return Task.CompletedTask;
     }
 
-    private async Task ConvertButtonClicked()
-    {
-        await ParseText();
-    }
+    private async Task ConvertButtonClicked() => await ParseText();
 
     private async Task ParseText()
     {
+        _parseCt?.Cancel();
+        _parseCt?.Dispose();
+        _parseCt = new();
 
         try
         {
-            output = await _parseServiceService.ParseText(input, new Config());
-            StateHasChanged();
+            var result = await _parseServiceService.Parse(_input, new Config(), _parseCt.Token);
+            _output = result.Output;
         }
         catch (SyntaxErrorException e)
         {
-            // Show error modal
+            await ShowError("Syntax Error", e.Message);
         }
-        catch (Exception e)
+        catch (ParseServiceException e)
         {
-            output = e.Message;
+            await ShowError("Parsing Error", e.Message);
+        }
+        catch (OperationCanceledException)
+        {
         }
         finally
         {
             StateHasChanged();
+        }
+    }
+
+    private async Task ShowError(string title, string? message, int delay = 4000)
+    {
+        _errorTitle = title;
+        _errorMessage = message;
+        _showError = true;
+        StateHasChanged();
+
+        _errorCt?.Cancel();
+        _errorCt?.Dispose();
+        _errorCt = new();
+
+        try
+        {
+            await Task.Delay(delay, _errorCt.Token);
+            
+            _showError = false;
+            StateHasChanged();
+        }
+        catch (OperationCanceledException)
+        {
         }
     }
 
