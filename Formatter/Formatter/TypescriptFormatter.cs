@@ -21,8 +21,7 @@ public sealed class TypescriptFormatter : IFormatter
         FormatNamingConvention(ref identifier);
         Sb.Append(FormatIdentifier(identifier));
         Sb.AppendLine(FormatType(type));
-
-        Console.WriteLine(FormatConfiguration.HasConstructor);
+        
         if (FormatConfiguration.HasConstructor)
             ConstructorManager.FormatConstructorParameter(identifier);
     }

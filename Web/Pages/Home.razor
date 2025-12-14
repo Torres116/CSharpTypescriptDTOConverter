@@ -7,9 +7,9 @@
 
 <PageTitle>C#TSDTOConvert</PageTitle>
 
-<div class="w-full h-full flex justify-center gap-4">
+<div class="w-screen h-full flex justify-center gap-4 overflow-hidden overscroll-none">
 
-    <section class="flex flex-row flex-wrap w-full">
+    <section class="flex flex-row flex-wrap w-full overflow-hidden">
 
         @* Containers *@
         <div class="flex flex-row flex-wrap gap-4 flex-grow justify-center w-full p-6">
@@ -17,7 +17,8 @@
             @* User Input Container *@
             <Editor Config="@(new EditorConfig(false, "CSharp", csIcon))" OnChange="@OnInputChange"/>
             @* Parsed  output *@
-            <Editor @key="_output" Config="@(new EditorConfig(true, "Typescript", tsIcon))" Text="@_output"/>
+            <Editor @key="_output" @ref="_outputEditor" Config="@(new EditorConfig(true, "Typescript", tsIcon))"
+                    Text="@_output"/>
 
             <FormatConfigurationContainer/>
         </div>
@@ -37,10 +38,7 @@
             </button>
         </div>
 
-        <div class="@(_showError
-                        ? "flex opacity-100 translate-x-0"
-                        : "flex opacity-0 translate-x-full"
-                    ) transition-all duration-300 absolute top-10 right-10">
+        <div class="fixed top-10 right-10">
             <ErrorModal Message="@_errorMessage" Title="@_errorTitle" HasError="@_showError"/>
         </div>
 
@@ -52,14 +50,16 @@
 
     string _input = string.Empty;
     string _output = string.Empty;
-    
+
     string? _errorTitle;
     string? _errorMessage;
-    
+
     bool _showError;
 
     private CancellationTokenSource? _parseCt;
     private CancellationTokenSource? _errorCt;
+
+    private Editor _outputEditor;
 
     const string tsIcon = "svg/TS.svg";
     const string csIcon = "svg/CSharp.svg";
@@ -80,21 +80,28 @@
         _parseCt?.Dispose();
         _parseCt = new();
 
+        await _outputEditor.ShowLoading(true);
+        await Task.Yield(); // Makes the loading appear
+
         try
         {
             var result = await _parseServiceService.Parse(_input, new Config(), _parseCt.Token);
             _output = result.Output;
+            await _outputEditor.ShowLoading(false);
         }
         catch (SyntaxErrorException e)
         {
+            await _outputEditor.ShowLoading(false);
             await ShowError("Syntax Error", e.Message);
         }
         catch (ParseServiceException e)
         {
+            await _outputEditor.ShowLoading(false);
             await ShowError("Parsing Error", e.Message);
         }
         catch (OperationCanceledException)
         {
+            await _outputEditor.ShowLoading(false);
         }
         finally
         {
@@ -116,7 +123,7 @@
         try
         {
             await Task.Delay(delay, _errorCt.Token);
-            
+
             _showError = false;
             StateHasChanged();
         }

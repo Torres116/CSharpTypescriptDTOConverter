@@ -1,9 +1,20 @@
 @inject IJSRuntime JS
 
-
 <div
-    class="lg:max-w-[600px] max-w-[350px] md:w-[400px] h-[400px] md:h-[630px]
+    class="relative lg:max-w-[600px] max-w-[350px] md:w-[400px] h-[400px] md:h-[630px] overflow-x-hidden
     flex-grow flex flex-col border border-white/10 rounded-lg bg-[#222222] overflow-clip">
+
+    @* Loading animation *@
+    @if (_isLoading)
+    {
+        <div class="absolute inset-0 place-self-center z-50 flex items-center justify-center ">
+            <div role="status"
+                 class="h-8 w-8 animate-spin rounded-full border-2 border-white border-r-transparent
+                        motion-reduce:animate-[spin_0.2s_infinite]" />
+        </div>
+    }
+
+
     <div class="w-full h-14 p-4 flex items-center justify-between border-b border-white/10">
         <div class="flex gap-2 items-center">
             <img src="@Config.LogoPath" alt="Logo" class="h-6 w-6"/>
@@ -14,7 +25,7 @@
 
             @if (!Config.IsReadOnly)
             {
-                <button class="flex items-center hover:opacity-70 hover:bg-gray-100/10 p-[6px] rounded-lg"
+                <button class="flex items-center hover:opacity-70 hover:bg-gray-100/10 p-1.5 rounded-lg"
                         onclick="@PasteTextToArea">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                          stroke="#FFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -44,7 +55,7 @@
     <div class="flex-1 flex overflow-hidden">
         @if (Config.IsReadOnly)
         {
-            <div class="h-full w-full flex p-2 overflow-scroll">
+            <div class="h-full w-full flex p-2 pr-0">
                 <pre class="w-full h-full p-0 m-0">
                     <code
                         class="language-typescript bg-transparent h-full text-md 
@@ -98,6 +109,15 @@
     [Parameter] public required EditorConfig Config { get; set; }
     [Parameter] public EventCallback<string> OnChange { get; set; }
 
+    bool _isLoading;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _isLoading = false;
+        StateHasChanged();
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!string.IsNullOrEmpty(Text))
@@ -110,6 +130,12 @@
             await OnChange.InvokeAsync(e.Value?.ToString());
 
         StateHasChanged();
+    }
+
+    public Task ShowLoading(bool isLoading)
+    {
+        _isLoading = isLoading;
+        return InvokeAsync(StateHasChanged);
     }
 
     private async Task CopyTextToClipboard()
@@ -126,4 +152,3 @@
     }
 
 }
-

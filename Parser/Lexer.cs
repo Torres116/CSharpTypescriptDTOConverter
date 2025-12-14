@@ -37,7 +37,7 @@ internal sealed partial class Lexer
         "timespan"
     };
 
-    public List<IToken> Tokenize(string input)
+    public List<IToken> Tokenize(string input,CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(input))
             return [];
@@ -49,6 +49,7 @@ internal sealed partial class Lexer
         {
             foreach (var line in formattedInput)
             {
+                ct.ThrowIfCancellationRequested();
                 var token = CreateToken(line);
                 result.Add(token);
             }
