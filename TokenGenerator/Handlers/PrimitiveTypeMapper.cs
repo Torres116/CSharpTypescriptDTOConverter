@@ -23,12 +23,12 @@ internal sealed class PrimitiveTypeMapper
         { "uint", "number" },
         { "ulong", "number" },
         { "ushort", "number" },
-        { "object", "any" },
+        { "object", "any" }
     };
 
     public static void Convert(IParsedToken token)
     {
-        var type = token.Type?.Replace("?", "").Replace("[]", "").ToLower();
+        var type = token.Type.Replace("?", "").Replace("[]", "").ToLower();
         var result = Types!.GetValueOrDefault(type, null);
 
         if (result != null)

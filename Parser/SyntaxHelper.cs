@@ -5,10 +5,10 @@ namespace Parser;
 
 public class SyntaxHelper
 {
-    public static List<string> GetSyntaxErrors(string input)
+    public static List<string> GetSyntaxErrors(string input,CancellationToken ct = default)
     {
         var tree = CSharpSyntaxTree.ParseText(input);
-        var errors = tree.GetDiagnostics();
+        var errors = tree.GetDiagnostics(ct);
         return errors.Where(e => e.Severity == DiagnosticSeverity.Error)
             .Select(e => e.ToString()).ToList();
     }

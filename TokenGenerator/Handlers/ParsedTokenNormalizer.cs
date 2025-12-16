@@ -8,7 +8,7 @@ internal static class ParsedTokenNormalizer
     public static void NormalizeIdentifier(IParsedToken token)
     {
         if (!FormatConfiguration.IncludeOptionals)
-            token.Identifier = token.Identifier!.Replace("?", "");
+            token.Identifier = token.Identifier.Replace("?", "");
     }
 
     public static void NormalizeType(IParsedToken token)

@@ -15,7 +15,7 @@ public sealed class ParseService
 
     private async Task<ConversionResult> Convert(string text,CancellationToken ct)
     {
-        var syntaxErrors = SyntaxHelper.GetSyntaxErrors(text);
+        var syntaxErrors = SyntaxHelper.GetSyntaxErrors(text,ct);
         if (syntaxErrors.Count > 0)
         {
             var errors = syntaxErrors.Aggregate("", (current, error) => current + error + "\n");

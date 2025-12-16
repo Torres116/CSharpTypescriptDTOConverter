@@ -2,7 +2,7 @@
 
 <div
     class="relative lg:max-w-[600px] max-w-[350px] md:w-[400px] h-[400px] md:h-[630px] overflow-x-hidden
-    flex-grow flex flex-col border border-white/10 rounded-lg bg-[#222222] overflow-clip">
+    flex-grow flex flex-col border-2 border-white/20 rounded-lg bg-[#222222] overflow-clip">
 
     @* Loading animation *@
     @if (_isLoading)
@@ -15,7 +15,7 @@
     }
 
 
-    <div class="w-full h-14 p-4 flex items-center justify-between border-b border-white/10">
+    <div class="w-full h-14 p-4 flex items-center justify-between bg-[#1a1a1a] border-b border-white/20">
         <div class="flex gap-2 items-center">
             <img src="@Config.LogoPath" alt="Logo" class="h-6 w-6"/>
             <h1 class="text-lg text-white">@Config.Title</h1>
@@ -79,7 +79,7 @@
         }
     </div>
 
-    <div class="flex items-center p-4 border-t border-white/10 h-10 w-full bg-[#1a1a1a]">
+    <div class="flex items-center p-4 border-t border-white/20 h-10 w-full bg-[#1a1a1a]">
         <span class="text-xs text-white/40"> @($"{Text?.Split("\n").Length ?? 0} Lines") -
             @($"{Text?.Length ?? 0} characters")</span>
     </div>

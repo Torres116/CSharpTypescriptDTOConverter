@@ -26,10 +26,10 @@ internal sealed class TypescriptParser : IParser
         }
 
         var ft = new TypescriptFormatter();
-        ft.Format(_conversionResult.ParsedTokens
-            .Select(token => (token.Identifier, token.Type, token.IsComment, token.Comment, token.IsDeclaration,
-                token.IsCustomType, token.CustomTypes))
-            .ToList());
+        ft.Format(_conversionResult.ParsedTokens.Select(token => (
+                token.Identifier, token.Type, token.IsComment, token.Comment,
+                token.IsDeclaration, token.IsCustomType, token.CustomTypes)).ToList()
+        );
 
         return Task.FromResult(ft.GetResult());
     }

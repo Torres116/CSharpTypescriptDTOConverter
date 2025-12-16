@@ -58,9 +58,9 @@ internal sealed class DictionaryConversionHandler(ITokenGenerator generator) : I
         }
         else
         {
-            var types = token.Type?.RemoveDictionary().Split(",") ?? [];
-            type1 = types[0]?.Trim();
-            type2 = types[1]?.Trim();
+            var types = token.Type.RemoveDictionary().Split(",") ?? [];
+            type1 = types[0].Trim();
+            type2 = types[1].Trim();
         }
 
         var keyToken = generator.ConvertType(new TypescriptToken
