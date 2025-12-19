@@ -1,4 +1,3 @@
-using Formatter.Configuration;
 using TokenGenerator.Handlers;
 using TokenGenerator.Handlers.Identifier;
 using TokenGenerator.Handlers.Type;
@@ -21,11 +20,11 @@ public sealed class TypescriptTokenGenerator : ITokenGenerator
     {
         _typeHandlers = new()
         {
-            new NullableConversionHandler(this),
-            new DateAsStringConversionHandler(this),
+            new NullableConversionHandler(),
+            new DateAsStringConversionHandler(),
             new ListConversionHandler(this),
             new CustomTypeHandler(),
-            new DictionaryConversionHandler(this),
+            new DictionaryConversionHandler(this)
         };
     }
 
@@ -47,8 +46,8 @@ public sealed class TypescriptTokenGenerator : ITokenGenerator
 
         var result = new TypescriptToken
         {
-            Identifier = token.Identifier ?? string.Empty,
-            Type = token.Type ?? string.Empty,
+            Identifier = token.Identifier,
+            Type = token.Type,
             IsComment = false,
             Comment = token.Comment,
             IsDeclaration = token.IsDeclaration

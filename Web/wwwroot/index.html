@@ -12,6 +12,28 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
     <!-- If you add any scoped CSS files, uncomment the following to load them
     <link href="Blazor.styles.css" rel="stylesheet" /> -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+        @font-face {
+            font-family: "JetBrains Mono";
+            font-weight: 100 900;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        @theme {
+            --font-mono: "JetBrainsMono", ui-monospace, monospace;
+        }
+
+        code, pre, textarea {
+            font-family: var(--font-mono), monospace !important;
+        }
+
+        .main-font {
+            font-family: var(--font-mono), monospace !important;
+        }
+    </style>
 </head>
 
 <body class=" bg-[#1a1a1a]">

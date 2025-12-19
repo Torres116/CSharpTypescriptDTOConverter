@@ -15,7 +15,7 @@
         <div class="flex flex-row flex-wrap gap-4 flex-grow justify-center w-full p-6">
 
             @* User Input Container *@
-            <Editor Config="@(new EditorConfig(false, "CSharp", csIcon))" OnChange="@OnInputChange"/>
+            <Editor Config="@(new EditorConfig(false, "CSharp", csIcon))" @ref="_inputEditor"/>
             @* Parsed  output *@
             <Editor @key="_output" @ref="_outputEditor" Config="@(new EditorConfig(true, "Typescript", tsIcon))"
                     Text="@_output"/>
@@ -59,18 +59,13 @@
     private CancellationTokenSource? _parseCt;
     private CancellationTokenSource? _errorCt;
 
+    private Editor _inputEditor;
     private Editor _outputEditor;
 
     const string tsIcon = "svg/TS.svg";
     const string csIcon = "svg/CSharp.svg";
 
     readonly ParseService _parseServiceService = new();
-
-    private Task OnInputChange(string text)
-    {
-        _input = text;
-        return Task.CompletedTask;
-    }
 
     private async Task ConvertButtonClicked() => await ParseText();
 
@@ -82,6 +77,8 @@
 
         await _outputEditor.ShowLoading(true);
         await Task.Yield(); // Makes the loading appear
+
+        _input = _inputEditor.GetInput();
 
         try
         {

@@ -49,6 +49,6 @@ internal sealed partial class CustomTypeHandler : ITokenHandler
         return type;
     }
 
-    [GeneratedRegex(@"<.*>")]
+    [GeneratedRegex("<.*>")]
     private static partial Regex TypeRegex();
 }

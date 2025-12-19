@@ -3,7 +3,7 @@ using TokenGenerator.Validation;
 
 namespace TokenGenerator.Handlers.Type;
 
-internal sealed class NullableConversionHandler(ITokenGenerator generator) : ITokenHandler
+internal sealed class NullableConversionHandler : ITokenHandler
 {
     public void Verify(IParsedToken token)
     {

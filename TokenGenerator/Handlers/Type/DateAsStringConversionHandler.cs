@@ -4,7 +4,7 @@ using TokenGenerator.Validation;
 
 namespace TokenGenerator.Handlers.Type;
 
-internal sealed class DateAsStringConversionHandler(ITokenGenerator generator) : ITokenHandler
+internal sealed class DateAsStringConversionHandler : ITokenHandler
 {
     public void Verify(IParsedToken token)
     {

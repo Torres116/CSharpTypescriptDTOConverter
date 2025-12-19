@@ -10,7 +10,7 @@
         <div class="absolute inset-0 place-self-center z-50 flex items-center justify-center ">
             <div role="status"
                  class="h-8 w-8 animate-spin rounded-full border-2 border-white border-r-transparent
-                        motion-reduce:animate-[spin_0.2s_infinite]" />
+                        motion-reduce:animate-[spin_0.2s_infinite]"/>
         </div>
     }
 
@@ -58,14 +58,14 @@
             <div class="h-full w-full flex p-2 pr-0">
                 <pre class="w-full h-full p-0 m-0">
                     <code
-                        class="language-typescript bg-transparent h-full text-md 
+                        class="language-typescript bg-transparent h-full text-sm 
                             whitespace-pre">@Text</code>
                 </pre>
             </div>
         }
         else
         {
-            <textarea class="w-full h-full p-2 bg-transparent text-white/90 main-font text-md 
+            <textarea class="w-full h-full p-2 bg-transparent text-white/90 main-font text-sm 
                 resize-none focus:outline-none" id="inputeditor"
                       spellcheck="false"
                       autocapitalize="off"
@@ -74,6 +74,7 @@
                       readonly="@Config.IsReadOnly"
                       @bind="Text"
                       @bind:event="oninput"
+                      onkeydown="handleKeyDown.call(this, event)"
                       onchange="@OnTextAreaChange"
             ></textarea>
         }
@@ -101,22 +102,29 @@
         }
     }
 
+    function handleKeyDown(e) {
+        if (e.key == "Tab") {
+            e.preventDefault();
+
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+
+            this.value =
+                this.value.substring(0, start) + "\t" + this.value.substring(end);
+
+            this.selectionStart = this.selectionEnd = start + 1;
+        }
+    }
+
 </script>
 
 @code {
 
-    [Parameter] public string Text { get; set; } = "";
+    [Parameter] public string Text { get; set; } = string.Empty;
     [Parameter] public required EditorConfig Config { get; set; }
-    [Parameter] public EventCallback<string> OnChange { get; set; }
+    [Parameter] public EventCallback<string>? OnChange { get; set; }
 
     bool _isLoading;
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        _isLoading = false;
-        StateHasChanged();
-    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -126,8 +134,8 @@
 
     private async Task OnTextAreaChange(ChangeEventArgs e)
     {
-        if (!Config.IsReadOnly)
-            await OnChange.InvokeAsync(e.Value?.ToString());
+        if (!Config.IsReadOnly && OnChange.HasValue)
+            await OnChange.Value.InvokeAsync(e.Value?.ToString());
 
         StateHasChanged();
     }
@@ -138,6 +146,8 @@
         return InvokeAsync(StateHasChanged);
     }
 
+    public string GetInput() => Text;
+
     private async Task CopyTextToClipboard()
     {
         await JS.InvokeVoidAsync("copyText", Text);
@@ -145,9 +155,15 @@
 
     private async Task PasteTextToArea()
     {
+        if (!Config.IsReadOnly)
+            return;
+
         var result = await JS.InvokeAsync<string>("pasteText");
         Text = result;
-        await OnChange.InvokeAsync(result);
+
+        if (OnChange.HasValue)
+            await OnChange.Value.InvokeAsync(result);
+
         StateHasChanged();
     }
 

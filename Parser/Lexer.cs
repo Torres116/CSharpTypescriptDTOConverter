@@ -37,7 +37,7 @@ internal sealed partial class Lexer
         "timespan"
     };
 
-    public List<IToken> Tokenize(string input,CancellationToken ct = default)
+    public List<IToken> Tokenize(string input, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(input))
             return [];
@@ -66,25 +66,30 @@ internal sealed partial class Lexer
     // Format input 
     private IEnumerable<string> GetLines(string input)
     {
+        input = RemoveNamespaces().Replace(input, string.Empty);
+        input = RemoveImports().Replace(input, string.Empty);
+        input = RemoveProperties().Replace(input, string.Empty);
         input = RemoveSpaceAfter().Replace(input, "<"); // remove spaces after '<'
         input = RemoveSpacesBefore().Replace(input, ">"); // remove spaces before '>'
 
         var separators = new[] { "\n" };
         var formattedInput = input
             .Split(separators, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Select(c => c.Replace(";", "").Replace("\n", "").Replace("\t", ""))
+            .Select(c => c.Replace(";", string.Empty).Replace("\n", string.Empty).Replace("\t", string.Empty))
             .ToArray();
 
         return formattedInput;
     }
 
     // Remove spaces and split line
-    private string[] SplitLine(string input)
+    private static string[] SplitLine(string input)
     {
         input = RemoveSpacesAroundComma().Replace(input, ",");
         return input.Split([" "], StringSplitOptions.RemoveEmptyEntries)
             .Where(c => !IgnoredKeywords.Contains(c))
-            .Select(c => c.Replace("{", "").Replace("}", "").Replace("(", "").Replace(")", "").Replace(":", ""))
+            .Select(c =>
+                c.Replace("{", string.Empty).Replace("}", string.Empty).Replace("(", string.Empty)
+                    .Replace(")", string.Empty).Replace(":", string.Empty))
             .ToArray();
     }
 
@@ -140,4 +145,13 @@ internal sealed partial class Lexer
 
     [GeneratedRegex(@"\s*>")]
     private static partial Regex RemoveSpacesBefore();
+
+    [GeneratedRegex(@"\{.*get;.*set;.*\}.*")]
+    private static partial Regex RemoveProperties();
+
+    [GeneratedRegex(@"using\s+.*;")]
+    private static partial Regex RemoveImports();
+    
+    [GeneratedRegex(@"namespace\s+.*;")]
+    private static partial Regex RemoveNamespaces();
 }
