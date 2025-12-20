@@ -6,37 +6,6 @@ namespace Parser;
 
 internal sealed partial class Lexer
 {
-    private static readonly HashSet<string> IgnoredKeywords = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "public",
-        "private",
-        "protected",
-        "internal",
-        "async",
-        "enum"
-    };
-
-    private static readonly HashSet<string> DeclarationKeywords = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "class",
-        "record"
-    };
-
-    private static readonly HashSet<string> Type = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "class",
-        "interface",
-        "record",
-        "string",
-        "bool",
-        "int",
-        "float",
-        "double",
-        "char",
-        "datetime",
-        "timespan"
-    };
-
     public List<IToken> Tokenize(string input, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(input))
@@ -86,7 +55,7 @@ internal sealed partial class Lexer
     {
         input = RemoveSpacesAroundComma().Replace(input, ",");
         return input.Split([" "], StringSplitOptions.RemoveEmptyEntries)
-            .Where(c => !IgnoredKeywords.Contains(c))
+            .Where(c => !Keywords.IgnoredKeywords.Contains(c))
             .Select(c =>
                 c.Replace("{", string.Empty).Replace("}", string.Empty).Replace("(", string.Empty)
                     .Replace(")", string.Empty).Replace(":", string.Empty))
@@ -104,7 +73,7 @@ internal sealed partial class Lexer
             if (string.IsNullOrWhiteSpace(current))
                 break;
 
-            if (DeclarationKeywords.Contains(current) && j < currentLine.Length - 1)
+            if (Keywords.DeclarationKeywords.Contains(current) && j < currentLine.Length - 1)
             {
                 var identifier = currentLine[++j];
                 token = new Token
@@ -125,7 +94,7 @@ internal sealed partial class Lexer
                 break;
             }
 
-            if (Type.Contains(current.ToLower()) || (token.Type == null && j < currentLine.Length - 1))
+            if (Keywords.Types.Contains(current.ToLower()) || (token.Type == null && j < currentLine.Length - 1))
             {
                 token.Type = current;
                 continue;
@@ -151,7 +120,7 @@ internal sealed partial class Lexer
 
     [GeneratedRegex(@"using\s+.*;")]
     private static partial Regex RemoveImports();
-    
+
     [GeneratedRegex(@"namespace\s+.*;")]
     private static partial Regex RemoveNamespaces();
 }
